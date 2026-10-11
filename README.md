@@ -37,7 +37,7 @@ See `Manual_en.html` (English) or `説明書.html` (Japanese) for details. Use t
 ## ファイルの確認 / Verify the download
 
 ```powershell
-Get-FileHash .\KaisenChecker_v1.1.1.zip -Algorithm SHA256
+Get-FileHash .\KaisenChecker_v1.1.2.zip -Algorithm SHA256
 ```
 
 結果を、配布ページの `SHA256SUMS.txt` と比べてください。 / Compare the result with `SHA256SUMS.txt` on the release page.
@@ -61,6 +61,7 @@ MIT License — Copyright (c) 2026 Cape-PC。くわしくは `LICENSE` を見て
 
 ## 変更履歴 / Changelog
 
+- 1.1.2：やさしい取説の英語版（`Beginners_Guide_en.html`）を追加。取説exeは、アプリの言語に合わせて日本語版か英語版を開く。 / Added the English beginner's guide; the guide exe opens the one that matches the app's language.
 - 1.1.1：英語版の説明書（`Manual_en.html`）を追加。アプリの「説明書」ボタンが、表示中の言語の説明書を開くように変更。 / Added the English manual; the Manual button opens the manual in the current language.
 - 1.1.0：英語表示、ダークモード、国一覧の自動取得、VPN ソフト別の案内、免責表示を追加。履歴の保存先を `%LOCALAPPDATA%\KaisenChecker` に変更。
 - 1.0.0：最初の版。

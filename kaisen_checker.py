@@ -24,7 +24,7 @@ from tkinter import ttk
 
 APP_NAME_JA = "回線チェッカー"
 APP_NAME_EN = "Connection Checker"
-VERSION = "1.1.1"
+VERSION = "1.1.2"
 
 # 設定ファイルを置いた URL（GitHub の raw URL など）。空なら組み込みのドメイン一覧だけを使う。
 # 形式: {"domains": ["claude.ai", ...]}
