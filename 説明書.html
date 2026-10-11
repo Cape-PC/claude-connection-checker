@@ -1,0 +1,288 @@
+<title>回線チェッカー 説明書</title>
+<style>
+/* Layout: single reading column; screenshot beside the legend on wide screens, stacked on phones */
+:root {
+  --bg: #f5f6f8; --fg: #1d2330; --muted: #5b6475; --line: #d9dde5; --panel: #ffffff;
+  --accent: #2f5bd3; --accent-hover: #2449ad;
+  --safe: #1f7a4a; --safe-bg: #e8f5ee; --warn: #a35f00; --warn-bg: #fff4e0; --bad: #b42318; --bad-bg: #fdecea;
+  --f-display: "Zen Kaku Gothic New", "Yu Gothic UI", "Hiragino Sans", sans-serif;
+  --f-body: "Noto Sans JP", "Yu Gothic UI", "Hiragino Sans", sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #12151c; --fg: #e6e9ef; --muted: #9aa3b5; --line: #2a303c; --panel: #1a1f29;
+  --accent: #7fa0ff; --accent-hover: #a3bcff;
+  --safe: #6fd39c; --safe-bg: #15301f; --warn: #ffb35c; --warn-bg: #3a2614; --bad: #ff8a80; --bad-bg: #3b1714; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #12151c; --fg: #e6e9ef; --muted: #9aa3b5; --line: #2a303c; --panel: #1a1f29;
+  --accent: #7fa0ff; --accent-hover: #a3bcff;
+  --safe: #6fd39c; --safe-bg: #15301f; --warn: #ffb35c; --warn-bg: #3a2614; --bad: #ff8a80; --bad-bg: #3b1714; color-scheme: dark }
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--f-body); font-size: 15px; line-height: 1.85;
+  word-break: keep-all; overflow-wrap: break-word; line-break: strict;
+}
+.wrap { max-width: 780px; margin: 0 auto; padding-inline: 16px; padding-block: 32px 64px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 36px; }
+h1 { font-family: var(--f-display); font-size: 1.8rem; line-height: 1.3; margin: 0; text-wrap: balance; }
+h2 { font-family: var(--f-display); font-size: 1.2rem; margin: 0 0 12px; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+h3 { font-size: 1rem; margin: 18px 0 6px; }
+p { margin: 0 0 10px; }
+.lead { color: var(--muted); margin-top: 8px; }
+.meta { font-family: var(--f-mono); font-size: 0.8rem; color: var(--muted); }
+nav ol { margin: 0; padding-left: 1.4em; columns: 2; column-gap: 24px; }
+nav a, .note a { color: var(--accent); text-decoration: none; border-radius: 3px; transition: color .15s; }
+nav a:hover, .note a:hover { color: var(--accent-hover); text-decoration: underline; }
+nav a:active, .note a:active { opacity: .6; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+code, .file { font-family: var(--f-mono); font-size: 0.86em; background: var(--panel); border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; }
+pre { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 10px 14px; overflow-x: auto; font-family: var(--f-mono); font-size: 0.85rem; margin: 0 0 10px; }
+ol.steps { margin: 0 0 10px; padding-left: 1.5em; display: grid; gap: 8px; }
+ol.steps li::marker { color: var(--accent); font-weight: 700; }
+ul { margin: 0 0 10px; padding-left: 1.2em; display: grid; gap: 4px; }
+.shot { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.shot figure { margin: 0; }
+.shot img { width: 100%; height: auto; border: 1px solid var(--line); border-radius: 6px; display: block; }
+.shot figcaption { font-size: 0.8rem; color: var(--muted); margin-top: 6px; }
+.legend { margin: 0; display: grid; gap: 10px; }
+.legend dt { font-weight: 700; }
+.legend dd { margin: 0; color: var(--muted); font-size: 0.92rem; }
+.levels { display: grid; gap: 10px; }
+.level { border: 1px solid; border-radius: 8px; padding: 10px 14px; display: grid; grid-template-columns: 5.5rem minmax(0, 1fr); gap: 12px; align-items: baseline; }
+.level .name { font-weight: 700; }
+.level .text { min-width: 0; color: var(--fg); }
+.level.safe { color: var(--safe); background: var(--safe-bg); }
+.level.warn { color: var(--warn); background: var(--warn-bg); }
+.level.bad { color: var(--bad); background: var(--bad-bg); }
+.table-wrap { overflow-x: auto; margin-bottom: 10px; }
+table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { color: var(--muted); font-weight: 700; white-space: nowrap; }
+.note { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px 16px; font-size: 0.92rem; }
+.note.warn { border-color: var(--warn); background: var(--warn-bg); }
+.note p:last-child { margin-bottom: 0; }
+@media (max-width: 640px) {
+  .shot { grid-template-columns: 1fr; }
+  nav ol { columns: 1; }
+  .level { grid-template-columns: 1fr; gap: 2px; }
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>回線チェッカー 説明書</h1>
+    <p class="lead">このパソコンのネットのつながり方が、<br>Anthropicから見てBANされやすい状態かどうかを判定するWindows 11用のアプリです。</p>
+    <p class="meta">バージョン 1.1.0 ／ 2026-10-10</p>
+  </header>
+
+  <div class="note warn">
+    <p><b>非公式ツールです。</b>Anthropic社とは関係ありません。<br>判定は目安で、<br>BANされないことを保証するものではありません。<br>くわしくは<a href="#disclaimer">免責事項</a>を読んでください。</p>
+  </div>
+
+  <nav aria-label="目次">
+    <ol>
+      <li><a href="#start">使い方</a></li>
+      <li><a href="#screen">画面の見方</a></li>
+      <li><a href="#levels">判定の3段階</a></li>
+      <li><a href="#limits">正しく判定できない場合</a></li>
+      <li><a href="#fix">安全でなかったとき</a></li>
+      <li><a href="#history">履歴</a></li>
+      <li><a href="#antivirus">起動できないとき</a></li>
+      <li><a href="#how">判定のしくみ</a></li>
+      <li><a href="#privacy">送信する情報</a></li>
+      <li><a href="#disclaimer">免責事項</a></li>
+    </ol>
+  </nav>
+
+  <section id="start">
+    <h2>使い方</h2>
+    <ol class="steps">
+      <li>ダウンロードしたzipファイルを右クリックし、<br><wbr><wbr>「⁠⁠⁠す⁠⁠⁠べ⁠⁠⁠て⁠⁠⁠展⁠⁠⁠開⁠⁠⁠」を選びます。</li>
+      <li>展開したフォルダの<span class="file">回線チェッカー.exe</span>をダブルクリックします。</li>
+      <li>起動すると自動でチェックが始まり、<br>数秒で結果が出ます。</li>
+      <li>VPNの設定を変えたあとは<wbr><wbr>「⁠⁠⁠再⁠⁠⁠チ⁠⁠⁠ェ⁠⁠⁠ッ⁠⁠⁠ク⁠⁠⁠」を押します。</li>
+    </ol>
+    <p>インストールは不要です。<span class="file">回線チェッカー.exe</span>と<span class="file">_internal</span>フォルダは、<br>同じ場所に置いたまま使ってください。</p>
+    <p>右上のボタンで、<br>日本語と英語を切り替えられます。<br>選んだ言語は次回の起動でも使われます。<br>Windowsをダークモードにしていると、<br>アプリも暗い配色で表示されます。</p>
+  </section>
+
+  <section id="screen">
+    <h2>画面の見方</h2>
+    <div class="shot">
+      <figure>
+        <img src="画面.png" alt="回線チェッカーの画面。上に緑色で「安全　BANされやすい接続ではありません」、その下にClaudeの6つのドメインと比較用のサイトの判定表、理由とやること、注意書き、下にボタンが並んでいる。" width="760" height="851">
+        <figcaption>判定が<wbr><wbr>「⁠⁠⁠安⁠⁠⁠全⁠⁠⁠」のときの画面</figcaption>
+      </figure>
+      <dl class="legend">
+        <dt>結論（上の色付きの帯）</dt>
+        <dd>安全・⁠要注意・⁠危険の3段階で、<br>色も緑・⁠黄・⁠赤に変わります。</dd>
+        <dt>接続先の表</dt>
+        <dd>Claudeの6つのドメインそれぞれについて、<br>つながっている国と回線の種類を出します。<br>いちばん下の<wbr><wbr>「⁠⁠⁠ほ⁠⁠⁠か⁠⁠⁠の⁠⁠⁠サ⁠⁠⁠イ⁠⁠⁠ト⁠⁠⁠」は比較用で、<br>結論には使いません。</dd>
+        <dt>国の一覧</dt>
+        <dd>Claudeを使える国の一覧を、<br>どこから取ったかを出します。<br>ふだんは公式ページから、<br>その日に取得します。</dd>
+        <dt>理由・⁠やること</dt>
+        <dd>その結論になった理由と、<br>次に何をすればよいかを出します。</dd>
+        <dt>除外ドメインをコピー</dt>
+        <dd>VPN経由のドメインがあるときだけ押せます。<br>ドメイン名を1行に1つずつコピーします。</dd>
+        <dt>履歴フォルダ・⁠説明書</dt>
+        <dd>履歴の保存先のフォルダと、<br>この説明書を開きます。</dd>
+      </dl>
+    </div>
+  </section>
+
+  <section id="levels">
+    <h2>判定の3段階</h2>
+    <div class="levels">
+      <div class="level safe"><span class="name">安全</span><span class="text">6つのドメインすべてが、<br>Claudeを使える国から、<br>VPNを通らない普通の回線でつながっています。</span></div>
+      <div class="level warn"><span class="name">要注意</span><span class="text">一部のドメインだけがVPN経由になっているか、<br>確認できなかったドメインがあります。</span></div>
+      <div class="level bad"><span class="name">危険</span><span class="text">Claudeを使える国の外からつながっているか、<br>確認できたドメインがすべてVPN経由です。</span></div>
+    </div>
+  </section>
+
+  <section id="limits">
+    <h2>正しく判定できない場合</h2>
+    <p>このアプリは、<br>アプリ自身の通信を使って判定します。<br>そのため、<br>次の場合は、<br>Claudeの実際の通信と結果が合わないことがあります。</p>
+    <h3>アプリ単位で除外するVPN</h3>
+    <p>NordVPN、<br>ExpressVPN、<br>Proton VPNなどは、<br>ドメインではなくアプリ単位でVPNから外す方式です。<br>Claudeのアプリだけを外していると、<br>回線チェッカー自身はVPNを通るので、<br>結果は<wbr><wbr>「⁠⁠⁠危⁠⁠⁠険⁠⁠⁠」になります。</p>
+    <p>正しく判定するには、<br>Claudeのアプリやブラウザと一緒に、<span class="file">回線チェッカー.exe</span>もVPNから外してください。</p>
+    <h3>ブラウザの拡張機能のVPN</h3>
+    <p>Chromeなどの拡張機能として動くVPNは、<br>ブラウザの通信だけを通します。<br>このアプリからは見えないので、<br>ブラウザ版のClaudeがVPNを通っていても<wbr><wbr>「⁠⁠⁠安⁠⁠⁠全⁠⁠⁠」と出ます。<br>ブラウザ版のClaudeを使うときは、<br>拡張機能のVPNをオフにしてください。</p>
+    <h3>会社や学校のネットワーク</h3>
+    <p>自動プロキシ設定（PACファイル）を使うネットワークでは、<br><wbr><wbr>「⁠⁠⁠確⁠⁠⁠認⁠⁠⁠不⁠⁠⁠可⁠⁠⁠」になることがあります。<br>会社や学校が管理するVPNは、<br>自分で設定を変えずに、<br>管理者に相談してください。</p>
+  </section>
+
+  <section id="fix">
+    <h2>安全でなかったとき</h2>
+    <h3>VPN経由のドメインがあるとき</h3>
+    <ol class="steps">
+      <li><wbr><wbr>「⁠⁠⁠除⁠⁠⁠外⁠⁠⁠ド⁠⁠⁠メ⁠⁠⁠イ⁠⁠⁠ン⁠⁠⁠を⁠⁠⁠コ⁠⁠⁠ピ⁠⁠⁠ー⁠⁠⁠」を押します。</li>
+      <li>使っているVPNソフトの除外設定を開き、<br>ドメインを追加します。<br>設定の場所は下の表を見てください。</li>
+      <li>回線チェッカーで<wbr><wbr>「⁠⁠⁠再⁠⁠⁠チ⁠⁠⁠ェ⁠⁠⁠ッ⁠⁠⁠ク⁠⁠⁠」を押し、<br><wbr><wbr>「⁠⁠⁠安⁠⁠⁠全⁠⁠⁠」になったか確かめます。</li>
+    </ol>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>VPNソフト</th><th>除外の方式</th><th>設定の場所</th></tr></thead>
+        <tbody>
+          <tr><td>AdGuard VPN</td><td>ドメイン</td><td><wbr><wbr>「⁠⁠⁠除⁠⁠⁠外⁠⁠⁠」→<wbr><wbr>「⁠⁠⁠手⁠⁠⁠動⁠⁠⁠で⁠⁠⁠追⁠⁠⁠加⁠⁠⁠す⁠⁠⁠る⁠⁠⁠」</td></tr>
+          <tr><td>Surfshark</td><td>ドメイン</td><td><wbr><wbr>「⁠⁠⁠V⁠⁠⁠P⁠⁠⁠N⁠⁠⁠設⁠⁠⁠定⁠⁠⁠」→<wbr><wbr>「⁠⁠⁠B⁠⁠⁠y⁠⁠⁠p⁠⁠⁠a⁠⁠⁠s⁠⁠⁠s⁠⁠⁠e⁠⁠⁠r⁠⁠⁠」→<wbr><wbr>「⁠⁠⁠ウ⁠⁠⁠ェ⁠⁠⁠ブ⁠⁠⁠サ⁠⁠⁠イ⁠⁠⁠ト⁠⁠⁠と⁠⁠⁠I⁠⁠⁠P⁠⁠⁠を⁠⁠⁠バ⁠⁠⁠イ⁠⁠⁠パ⁠⁠⁠ス⁠⁠⁠」</td></tr>
+          <tr><td>Windscribe</td><td>ドメイン</td><td><wbr><wbr>「⁠⁠⁠設⁠⁠⁠定⁠⁠⁠」→<wbr><wbr>「⁠⁠⁠ス⁠⁠⁠プ⁠⁠⁠リ⁠⁠⁠ッ⁠⁠⁠ト⁠⁠⁠ト⁠⁠⁠ン⁠⁠⁠ネ⁠⁠⁠リ⁠⁠⁠ン⁠⁠⁠グ⁠⁠⁠」→<wbr><wbr>「⁠⁠⁠除⁠⁠⁠外⁠⁠⁠」でホスト名を追加</td></tr>
+          <tr><td>Cloudflare WARP</td><td>ドメイン</td><td><wbr><wbr>「⁠⁠⁠設⁠⁠⁠定⁠⁠⁠」→<wbr><wbr>「⁠⁠⁠詳⁠⁠⁠細⁠⁠⁠設⁠⁠⁠定⁠⁠⁠」→<wbr><wbr>「⁠⁠⁠ス⁠⁠⁠プ⁠⁠⁠リ⁠⁠⁠ッ⁠⁠⁠ト⁠⁠⁠ト⁠⁠⁠ン⁠⁠⁠ネ⁠⁠⁠ル⁠⁠⁠」</td></tr>
+          <tr><td>NordVPN</td><td>アプリ</td><td><wbr><wbr>「⁠⁠⁠設⁠⁠⁠定⁠⁠⁠」→<wbr><wbr>「⁠⁠⁠ス⁠⁠⁠プ⁠⁠⁠リ⁠⁠⁠ッ⁠⁠⁠ト⁠⁠⁠ト⁠⁠⁠ン⁠⁠⁠ネ⁠⁠⁠リ⁠⁠⁠ン⁠⁠⁠グ⁠⁠⁠」</td></tr>
+          <tr><td>ExpressVPN</td><td>アプリ</td><td><wbr><wbr>「⁠⁠⁠オ⁠⁠⁠プ⁠⁠⁠シ⁠⁠⁠ョ⁠⁠⁠ン⁠⁠⁠」→<wbr><wbr>「⁠⁠⁠ス⁠⁠⁠プ⁠⁠⁠リ⁠⁠⁠ッ⁠⁠⁠ト⁠⁠⁠ト⁠⁠⁠ン⁠⁠⁠ネ⁠⁠⁠リ⁠⁠⁠ン⁠⁠⁠グ⁠⁠⁠」</td></tr>
+          <tr><td>Proton VPN</td><td>アプリ</td><td><wbr><wbr>「⁠⁠⁠設⁠⁠⁠定⁠⁠⁠」→<wbr><wbr>「⁠⁠⁠ス⁠⁠⁠プ⁠⁠⁠リ⁠⁠⁠ッ⁠⁠⁠ト⁠⁠⁠ト⁠⁠⁠ン⁠⁠⁠ネ⁠⁠⁠リ⁠⁠⁠ン⁠⁠⁠グ⁠⁠⁠」</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>メニューの名前は、<br>VPNソフトのバージョンによって変わることがあります。<br>アプリ単位の方式では、<br>Claudeのアプリ、<br>ブラウザ、<span class="file">回線チェッカー.exe</span>を外してください。</p>
+    <p>AdGuard VPNで<wbr><wbr>「⁠⁠⁠有⁠⁠⁠効⁠⁠⁠な⁠⁠⁠ド⁠⁠⁠メ⁠⁠⁠イ⁠⁠⁠ン⁠⁠⁠名⁠⁠⁠を⁠⁠⁠入⁠⁠⁠力⁠⁠⁠し⁠⁠⁠て⁠⁠⁠く⁠⁠⁠だ⁠⁠⁠さ⁠⁠⁠い⁠⁠⁠」と出るときは、<br>前後に空白が入っているか、<br>全角になっています。<br>入力欄を空にして、<br>半角で打ち直してください。</p>
+    <p>すぐに直せないときは、<br>Claudeを使う間だけVPNをオフにしてください。</p>
+
+    <h3>利用対象外の国と出たとき</h3>
+    <p>VPNの接続先が海外になっています。<br>接続先を日本など利用対象の国にするか、<br>VPNをオフにしてください。<br>接続先の国をたびたび変えるのも、<br>疑われる原因になると言われています。</p>
+
+    <h3>確認不可と出たとき</h3>
+    <p>少し待ってから<wbr><wbr>「⁠⁠⁠再⁠⁠⁠チ⁠⁠⁠ェ⁠⁠⁠ッ⁠⁠⁠ク⁠⁠⁠」を押してください。<br>続く場合は、<br>広告ブロッカー（AdGuardなど）が通信を止めている可能性があります。<br>広告ブロッカーを一時的にオフにして試してください。</p>
+
+    <div class="note">Claudeから本人確認を求められたら、<br>放置せずに対応してください。</div>
+  </section>
+
+  <section id="history">
+    <h2>履歴</h2>
+    <p>判定するたびに、<br>次の場所の<span class="file">history.csv</span>に1行ずつ追加します。<br><wbr><wbr>「⁠⁠⁠履⁠⁠⁠歴⁠⁠⁠フ⁠⁠⁠ォ⁠⁠⁠ル⁠⁠⁠ダ⁠⁠⁠」ボタンで開けます。<br>Excelでも開けます。</p>
+    <pre>%LOCALAPPDATA%\KaisenChecker\history.csv</pre>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>列</th><th>内容</th></tr></thead>
+        <tbody>
+          <tr><td>日時</td><td>判定した日時</td></tr>
+          <tr><td>結論</td><td>安全／要注意／危険</td></tr>
+          <tr><td>各ドメイン</td><td>OK／VPN経由／対象外の国／確認不可</td></tr>
+          <tr><td>VPNソフト</td><td>動いていたVPNソフトの名前</td></tr>
+          <tr><td>Windowsプロキシ</td><td>オン／オフ</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>IPアドレス、<br>地域、<br>プロバイダ名は記録しません。<br>Excelで開いたまま判定すると保存できないので、<br>閉じてから判定してください。<br>英語表示で判定した行は、<br>英語で記録されます。</p>
+    <p>同じフォルダには、<br>言語の設定（settings.json）と、<br>前回取得した国の一覧（countries.json）も保存されます。<br>アプリを削除するときは、<br>このフォルダも消してください。</p>
+  </section>
+
+  <section id="antivirus">
+    <h2>起動できないとき</h2>
+    <p>このアプリには電子署名がないため、<br>Windowsやウイルス対策ソフトに警告されることがあります。</p>
+    <h3><wbr><wbr>「⁠⁠⁠W⁠⁠⁠i⁠⁠⁠n⁠⁠⁠d⁠⁠⁠o⁠⁠⁠w⁠⁠⁠s⁠⁠⁠に⁠⁠⁠よ⁠⁠⁠っ⁠⁠⁠て⁠⁠⁠P⁠⁠⁠C⁠⁠⁠が⁠⁠⁠保⁠⁠⁠護⁠⁠⁠さ⁠⁠⁠れ⁠⁠⁠ま⁠⁠⁠し⁠⁠⁠た⁠⁠⁠」と出たとき</h3>
+    <ol class="steps">
+      <li><wbr><wbr>「⁠⁠⁠詳⁠⁠⁠細⁠⁠⁠情⁠⁠⁠報⁠⁠⁠」を押します。</li>
+      <li><wbr><wbr>「⁠⁠⁠実⁠⁠⁠行⁠⁠⁠」を押します。</li>
+    </ol>
+    <h3>Windows Defenderに削除・⁠ブロックされたとき</h3>
+    <ol class="steps">
+      <li>スタートメニューから<wbr><wbr>「⁠⁠⁠W⁠⁠⁠i⁠⁠⁠n⁠⁠⁠d⁠⁠⁠o⁠⁠⁠w⁠⁠⁠s⁠⁠⁠ ⁠⁠⁠セ⁠⁠⁠キ⁠⁠⁠ュ⁠⁠⁠リ⁠⁠⁠テ⁠⁠⁠ィ⁠⁠⁠」を開きます。</li>
+      <li><wbr><wbr>「⁠⁠⁠ウ⁠⁠⁠イ⁠⁠⁠ル⁠⁠⁠ス⁠⁠⁠と⁠⁠⁠脅⁠⁠⁠威⁠⁠⁠の⁠⁠⁠防⁠⁠⁠止⁠⁠⁠」を開き、<br><wbr><wbr>「⁠⁠⁠ウ⁠⁠⁠イ⁠⁠⁠ル⁠⁠⁠ス⁠⁠⁠と⁠⁠⁠脅⁠⁠⁠威⁠⁠⁠の⁠⁠⁠防⁠⁠⁠止⁠⁠⁠の⁠⁠⁠設⁠⁠⁠定⁠⁠⁠」の<wbr><wbr>「⁠⁠⁠設⁠⁠⁠定⁠⁠⁠の⁠⁠⁠管⁠⁠⁠理⁠⁠⁠」を押します。</li>
+      <li>下の方にある<wbr><wbr>「⁠⁠⁠除⁠⁠⁠外⁠⁠⁠」の<wbr><wbr>「⁠⁠⁠除⁠⁠⁠外⁠⁠⁠の⁠⁠⁠追⁠⁠⁠加⁠⁠⁠ま⁠⁠⁠た⁠⁠⁠は⁠⁠⁠削⁠⁠⁠除⁠⁠⁠」を押します。</li>
+      <li><wbr><wbr>「⁠⁠⁠除⁠⁠⁠外⁠⁠⁠の⁠⁠⁠追⁠⁠⁠加⁠⁠⁠」から<wbr><wbr>「⁠⁠⁠フ⁠⁠⁠ォ⁠⁠⁠ル⁠⁠⁠ダ⁠⁠⁠ー⁠⁠⁠」を選び、<br>展開した回線チェッカーのフォルダを選びます。</li>
+      <li>削除されていた場合は、<br><wbr><wbr>「⁠⁠⁠保⁠⁠⁠護⁠⁠⁠の⁠⁠⁠履⁠⁠⁠歴⁠⁠⁠」から復元します。</li>
+    </ol>
+    <h3>ファイルが本物か確かめる</h3>
+    <p>配布ページに載っているSHA-256の値と、<br>ダウンロードしたzipファイルの値が同じなら、<br>途中で書き換えられていません。<br>PowerShellで次のように確かめられます。</p>
+    <pre>Get-FileHash .\回線チェッカー_v1.1.0.zip -Algorithm SHA256</pre>
+  </section>
+
+  <section id="how">
+    <h2>判定のしくみ</h2>
+    <ol class="steps">
+      <li>Claudeの6つのドメインと比較用のサイトに接続し、<br>それぞれのサイトから見えている接続元を受け取ります。</li>
+      <li>接続元をIP判定サービスに問い合わせ、<br>国と、<br>VPN・⁠プロキシかどうかを調べます。<br>まずfreeipapi.comを使い、<br>つながらないときはIP2Location.ioを使います。</li>
+      <li>Claudeを使える国の一覧を、<br>Anthropicの公式ページから取得し、<br>国を照らし合わせます。<br>取得できないときは、<br>前回取得した一覧か、<br>アプリに組み込んだ一覧（2026-10-10時点）を使います。</li>
+      <li>パソコンで動いているVPNソフトと、<br>Windowsのプロキシ設定を調べます。</li>
+    </ol>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>調べるドメイン</th><th>使われる場面</th></tr></thead>
+        <tbody>
+          <tr><td><code>claude.ai</code></td><td>Claudeのアプリとウェブ版</td></tr>
+          <tr><td><code>api.anthropic.com</code></td><td>Claude CodeとAPI</td></tr>
+          <tr><td><code>console.anthropic.com</code></td><td>開発者向けの管理画面</td></tr>
+          <tr><td><code>claude.com</code></td><td>公式サイト</td></tr>
+          <tr><td><code>platform.claude.com</code></td><td>Claude Codeのログインと管理画面</td></tr>
+          <tr><td><code>support.claude.com</code></td><td>サポートと異議申し立て</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Anthropicは判定の基準を公開していません。<br>この結果は<wbr><wbr>「⁠⁠⁠疑⁠⁠⁠わ⁠⁠⁠れ⁠⁠⁠る⁠⁠⁠材⁠⁠⁠料⁠⁠⁠が⁠⁠⁠な⁠⁠⁠い⁠⁠⁠か⁠⁠⁠」の目安です。</p>
+  </section>
+
+  <section id="privacy">
+    <h2>送信する情報</h2>
+    <ul>
+      <li>Claudeの6つのドメイン、<br>比較用のwww.cloudflare.com、<br>Anthropicの国一覧のページに接続します。</li>
+      <li>接続元のIPアドレスを、<br>IP判定サービス（freeipapi.com、<br>IP2Location.io）に送ります。<br>通信はすべてHTTPSで暗号化されます。</li>
+      <li>IPアドレスは判定にだけ使い、<br>画面にも履歴にも残しません。</li>
+      <li>作者や第三者に、<br>利用状況を送ることはありません。</li>
+    </ul>
+  </section>
+
+  <section id="disclaimer">
+    <h2>免責事項</h2>
+    <ul>
+      <li>このアプリは非公式のツールです。<br>Anthropic社とは関係がなく、<br>Anthropic社が作成・⁠確認したものではありません。<br><wbr><wbr>「⁠⁠⁠C⁠⁠⁠l⁠⁠⁠a⁠⁠⁠u⁠⁠⁠d⁠⁠⁠e⁠⁠⁠」<wbr><wbr>「⁠⁠⁠A⁠⁠⁠n⁠⁠⁠t⁠⁠⁠h⁠⁠⁠r⁠⁠⁠o⁠⁠⁠p⁠⁠⁠i⁠⁠⁠c⁠⁠⁠」は、<br>Anthropic社の商標です。</li>
+      <li>判定は、<br>IP判定サービスの情報と、<br>公開されている情報にもとづく目安です。<br>正確さは保証しません。<br>BANされないことや、<br>アカウントが復活することを保証するものではありません。</li>
+      <li>このアプリを使ったことで生じた損害について、<br>作者は責任を負いません。</li>
+      <li>Claudeの利用規約と、<br>使える国の一覧は、<br>Anthropic社の公式ページで確認してください。</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>フォルダの中身</h2>
+    <div class="table-wrap">
+      <table>
+        <tbody>
+          <tr><td><span class="file">回線チェッカー.exe</span></td><td>アプリ本体</td></tr>
+          <tr><td><span class="file">_internal</span></td><td>アプリの動作に必要なファイル（消さないでください）</td></tr>
+          <tr><td><span class="file">説明書.html</span></td><td>この説明書</td></tr>
+          <tr><td><span class="file">画面.png</span></td><td>説明書で使う画面の画像</td></tr>
+          <tr><td><span class="file">README.md</span></td><td>概要</td></tr>
+          <tr><td><span class="file">回線チェッカー取説.exe</span></td><td>やさしい取説（ダブルクリックでブラウザに開きます）</td></tr>
+          <tr><td><span class="file">LICENSE</span></td><td>ライセンス（MIT License）</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>

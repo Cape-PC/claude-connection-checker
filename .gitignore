@@ -1,0 +1,7 @@
+# ビルド成果物（Releases で配布するのでリポジトリには入れない）
+dist/
+build/
+release/
+__pycache__/
+*.spec
+*.exe
