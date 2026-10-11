@@ -24,7 +24,7 @@ from tkinter import ttk
 
 APP_NAME_JA = "回線チェッカー"
 APP_NAME_EN = "Connection Checker"
-VERSION = "1.1.0"
+VERSION = "1.1.1"
 
 # 設定ファイルを置いた URL（GitHub の raw URL など）。空なら組み込みのドメイン一覧だけを使う。
 # 形式: {"domains": ["claude.ai", ...]}
@@ -199,7 +199,7 @@ TEXT = {
         "save_failed": "履歴を保存できませんでした（{e}）。Excelで開いている場合は閉じてください。",
         "error": "エラー：{e}。ネットの接続を確かめて、再チェックしてください。",
         "check_failed": "チェックできませんでした",
-        "no_manual": "説明書が見つかりません。exeと同じフォルダに 説明書.html を置いてください。",
+        "no_manual": "説明書が見つかりません。exeと同じフォルダに 説明書.html と Manual_en.html を置いてください。",
         "src_live": "国の一覧：公式ページから取得（{d}）",
         "src_cache": "国の一覧：前回取得した一覧（{d}）",
         "src_builtin": "国の一覧：組み込み（{d}時点）",
@@ -249,7 +249,7 @@ TEXT = {
         "save_failed": "Could not save history ({e}). Close the file if it is open in Excel.",
         "error": "Error: {e}. Check your internet connection and try again.",
         "check_failed": "Could not complete the check",
-        "no_manual": "Manual not found. Put 説明書.html in the same folder as the app.",
+        "no_manual": "Manual not found. Put Manual_en.html and 説明書.html in the same folder as the app.",
         "src_live": "Country list: fetched from the official page ({d})",
         "src_cache": "Country list: last fetched copy ({d})",
         "src_builtin": "Country list: built-in (as of {d})",
@@ -836,11 +836,13 @@ class App:
         os.startfile(data_dir())
 
     def open_manual(self):
-        path = os.path.join(app_dir(), "説明書.html")
-        if os.path.exists(path):
-            os.startfile(path)
-        else:
-            self.status.config(text=self.t("no_manual"))
+        names = ["Manual_en.html", "説明書.html"] if self.lang == "en" else ["説明書.html", "Manual_en.html"]
+        for name in names:
+            path = os.path.join(app_dir(), name)
+            if os.path.exists(path):
+                os.startfile(path)
+                return
+        self.status.config(text=self.t("no_manual"))
 
 
 def main():

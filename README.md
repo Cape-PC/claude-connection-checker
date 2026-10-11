@@ -13,8 +13,8 @@ A Windows 11 app that checks whether your connection to Claude goes through a VP
 1. zip を展開し、`回線チェッカー.exe` をダブルクリックします。 / Extract the zip and run `回線チェッカー.exe`.
 2. 数秒で結果が出ます。 / The result appears in a few seconds.
 
-くわしくは `説明書.html` を見てください（日本語）。右上のボタンで画面を英語に切り替えられます。
-See `説明書.html` for details (Japanese). Use the button in the top-right corner to switch the app to English.
+くわしくは `説明書.html`（日本語）または `Manual_en.html`（English）を見てください。アプリの右上のボタンで、日本語と英語を切り替えられます。
+See `Manual_en.html` (English) or `説明書.html` (Japanese) for details. Use the button in the top-right corner of the app to switch between Japanese and English.
 
 ## 送信する情報 / Data sent
 
@@ -37,7 +37,7 @@ See `説明書.html` for details (Japanese). Use the button in the top-right cor
 ## ファイルの確認 / Verify the download
 
 ```powershell
-Get-FileHash .\KaisenChecker_v1.1.0.zip -Algorithm SHA256
+Get-FileHash .\KaisenChecker_v1.1.1.zip -Algorithm SHA256
 ```
 
 結果を、配布ページの `SHA256SUMS.txt` と比べてください。 / Compare the result with `SHA256SUMS.txt` on the release page.
@@ -61,5 +61,6 @@ MIT License — Copyright (c) 2026 Cape-PC。くわしくは `LICENSE` を見て
 
 ## 変更履歴 / Changelog
 
+- 1.1.1：英語版の説明書（`Manual_en.html`）を追加。アプリの「説明書」ボタンが、表示中の言語の説明書を開くように変更。 / Added the English manual; the Manual button opens the manual in the current language.
 - 1.1.0：英語表示、ダークモード、国一覧の自動取得、VPN ソフト別の案内、免責表示を追加。履歴の保存先を `%LOCALAPPDATA%\KaisenChecker` に変更。
 - 1.0.0：最初の版。

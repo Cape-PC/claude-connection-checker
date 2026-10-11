@@ -68,9 +68,10 @@ th { color: var(--muted); font-weight: 700; white-space: nowrap; }
 
 <div class="wrap">
   <header>
+    <p class="meta" style="margin:0 0 8px"><a href="Manual_en.html">English</a> · 日本語</p>
     <h1>回線チェッカー 説明書</h1>
     <p class="lead">このパソコンのネットのつながり方が、<br>Anthropicから見てBANされやすい状態かどうかを判定するWindows 11用のアプリです。</p>
-    <p class="meta">バージョン 1.1.0 ／ 2026-10-10</p>
+    <p class="meta">バージョン 1.1.1 ／ 2026-10-11</p>
   </header>
 
   <div class="note warn">
@@ -222,7 +223,7 @@ th { color: var(--muted); font-weight: 700; white-space: nowrap; }
     </ol>
     <h3>ファイルが本物か確かめる</h3>
     <p>配布ページに載っているSHA-256の値と、<br>ダウンロードしたzipファイルの値が同じなら、<br>途中で書き換えられていません。<br>PowerShellで次のように確かめられます。</p>
-    <pre>Get-FileHash .\KaisenChecker_v1.1.0.zip -Algorithm SHA256</pre>
+    <pre>Get-FileHash .\KaisenChecker_v1.1.1.zip -Algorithm SHA256</pre>
   </section>
 
   <section id="how">
@@ -280,6 +281,8 @@ th { color: var(--muted); font-weight: 700; white-space: nowrap; }
           <tr><td><span class="file">画面.png</span></td><td>説明書で使う画面の画像</td></tr>
           <tr><td><span class="file">README.md</span></td><td>概要</td></tr>
           <tr><td><span class="file">回線チェッカー取説.exe</span></td><td>やさしい取説（ダブルクリックでブラウザに開きます）</td></tr>
+          <tr><td><span class="file">Manual_en.html</span></td><td>英語版の説明書</td></tr>
+          <tr><td><span class="file">screen_en.png</span></td><td>英語版の説明書で使う画面の画像</td></tr>
           <tr><td><span class="file">LICENSE</span></td><td>ライセンス（MIT License）</td></tr>
         </tbody>
       </table>

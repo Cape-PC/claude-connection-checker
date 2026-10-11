@@ -1,0 +1,289 @@
+<title>Connection Checker Manual</title>
+<style>
+/* Layout: single reading column; screenshot beside the legend on wide screens, stacked on phones */
+:root {
+  --bg: #f5f6f8; --fg: #1d2330; --muted: #5b6475; --line: #d9dde5; --panel: #ffffff;
+  --accent: #2f5bd3; --accent-hover: #2449ad;
+  --safe: #1f7a4a; --safe-bg: #e8f5ee; --warn: #a35f00; --warn-bg: #fff4e0; --bad: #b42318; --bad-bg: #fdecea;
+  --f-display: "Segoe UI Variable Display", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "Segoe UI", "Helvetica Neue", Arial, "Yu Gothic UI", sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #12151c; --fg: #e6e9ef; --muted: #9aa3b5; --line: #2a303c; --panel: #1a1f29;
+  --accent: #7fa0ff; --accent-hover: #a3bcff;
+  --safe: #6fd39c; --safe-bg: #15301f; --warn: #ffb35c; --warn-bg: #3a2614; --bad: #ff8a80; --bad-bg: #3b1714; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #12151c; --fg: #e6e9ef; --muted: #9aa3b5; --line: #2a303c; --panel: #1a1f29;
+  --accent: #7fa0ff; --accent-hover: #a3bcff;
+  --safe: #6fd39c; --safe-bg: #15301f; --warn: #ffb35c; --warn-bg: #3a2614; --bad: #ff8a80; --bad-bg: #3b1714; color-scheme: dark }
+body { background: var(--bg); color: var(--fg); font-family: var(--f-body); font-size: 16px; line-height: 1.7; margin: 0; overflow-wrap: break-word; }
+.wrap { max-width: 780px; margin: 0 auto; padding-inline: 16px; padding-block: 32px 64px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 36px; }
+h1 { font-family: var(--f-display); font-size: 1.9rem; line-height: 1.25; margin: 0; text-wrap: balance; }
+h2 { font-family: var(--f-display); font-size: 1.25rem; margin: 0 0 12px; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+h3 { font-size: 1rem; margin: 18px 0 6px; }
+p { margin: 0 0 10px; }
+a { color: var(--accent); }
+a:hover { color: var(--accent-hover); }
+a:active { opacity: .6; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.lead { color: var(--muted); margin-top: 8px; }
+.meta { font-family: var(--f-mono); font-size: 0.8rem; color: var(--muted); }
+.lang { font-size: 0.9rem; margin: 0 0 8px; }
+nav ol { margin: 0; padding-left: 1.4em; columns: 2; column-gap: 24px; }
+nav a { text-decoration: none; border-radius: 3px; }
+nav a:hover { text-decoration: underline; }
+code, .file { font-family: var(--f-mono); font-size: 0.86em; background: var(--panel); border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; }
+pre { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 10px 14px; overflow-x: auto; font-family: var(--f-mono); font-size: 0.85rem; margin: 0 0 10px; }
+ol.steps { margin: 0 0 10px; padding-left: 1.5em; display: grid; gap: 8px; }
+ol.steps li::marker { color: var(--accent); font-weight: 700; }
+ul { margin: 0 0 10px; padding-left: 1.2em; display: grid; gap: 4px; }
+.shot { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.shot figure { margin: 0; }
+.shot img { width: 100%; height: auto; border: 1px solid var(--line); border-radius: 6px; display: block; }
+.shot figcaption { font-size: 0.8rem; color: var(--muted); margin-top: 6px; }
+.legend { margin: 0; display: grid; gap: 10px; }
+.legend dt { font-weight: 700; }
+.legend dd { margin: 0; color: var(--muted); font-size: 0.92rem; }
+.levels { display: grid; gap: 10px; }
+.level { border: 1px solid; border-radius: 8px; padding: 10px 14px; display: grid; grid-template-columns: 6rem minmax(0, 1fr); gap: 12px; align-items: baseline; }
+.level .name { font-weight: 700; }
+.level .text { min-width: 0; color: var(--fg); }
+.level.safe { color: var(--safe); background: var(--safe-bg); }
+.level.warn { color: var(--warn); background: var(--warn-bg); }
+.level.bad { color: var(--bad); background: var(--bad-bg); }
+.table-wrap { overflow-x: auto; margin-bottom: 10px; }
+table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { color: var(--muted); font-weight: 700; white-space: nowrap; }
+.note { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px 16px; font-size: 0.92rem; }
+.note.warn { border-color: var(--warn); background: var(--warn-bg); }
+.note p:last-child { margin-bottom: 0; }
+@media (max-width: 640px) {
+  .shot { grid-template-columns: 1fr; }
+  nav ol { columns: 1; }
+  .level { grid-template-columns: 1fr; gap: 2px; }
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="lang">English · <a href="説明書.html">日本語</a></p>
+    <h1>Connection Checker Manual</h1>
+    <p class="lead">A Windows 11 app that checks whether your connection to Claude looks risky to Anthropic: whether it goes through a VPN or data center network, and whether you connect from a supported country.</p>
+    <p class="meta">Version 1.1.1 / 2026-10-11</p>
+  </header>
+
+  <div class="note warn">
+    <p><b>Unofficial tool.</b> Not affiliated with Anthropic. Results are a guide only and do not guarantee that your account won't be banned. See <a href="#disclaimer">Disclaimer</a>.</p>
+  </div>
+
+  <nav aria-label="Contents">
+    <ol>
+      <li><a href="#start">How to use</a></li>
+      <li><a href="#screen">Reading the screen</a></li>
+      <li><a href="#levels">The three results</a></li>
+      <li><a href="#limits">When results may be wrong</a></li>
+      <li><a href="#fix">If it isn't safe</a></li>
+      <li><a href="#history">History</a></li>
+      <li><a href="#antivirus">If the app won't start</a></li>
+      <li><a href="#how">How it works</a></li>
+      <li><a href="#privacy">Data sent</a></li>
+      <li><a href="#disclaimer">Disclaimer</a></li>
+    </ol>
+  </nav>
+
+  <section id="start">
+    <h2>How to use</h2>
+    <ol class="steps">
+      <li>Right-click the downloaded zip file and choose <b>Extract All</b>.</li>
+      <li>Open the extracted folder and double-click <span class="file">回線チェッカー.exe</span>.</li>
+      <li>The check starts automatically and the result appears in a few seconds.</li>
+      <li>After changing your VPN settings, click <b>Check again</b>.</li>
+    </ol>
+    <p>No installation is needed. Keep <span class="file">回線チェッカー.exe</span> and the <span class="file">_internal</span> folder together in the same place.</p>
+    <p>Use the button in the top-right corner to switch between Japanese and English. Your choice is remembered next time. If Windows is in dark mode, the app uses a dark theme too.</p>
+  </section>
+
+  <section id="screen">
+    <h2>Reading the screen</h2>
+    <div class="shot">
+      <figure>
+        <img src="screen_en.png" alt="The Connection Checker window. A green banner at the top says Safe, followed by a table of six Claude domains with their country and connection type, the reasons and what to do, a notice, and a row of buttons." width="760" height="851">
+        <figcaption>The window when the result is “Safe”</figcaption>
+      </figure>
+      <dl class="legend">
+        <dt>Banner (colored bar at the top)</dt>
+        <dd>The result: Safe, Caution or Danger, in green, yellow or red.</dd>
+        <dt>Domain table</dt>
+        <dd>The country and connection type for each of Claude's six domains. The last row, “other sites”, is for comparison and does not affect the result.</dd>
+        <dt>Country list</dt>
+        <dd>Where the list of supported countries came from. Normally it is fetched from Anthropic's official page.</dd>
+        <dt>Why / What to do</dt>
+        <dd>The reasons for the result and the next steps.</dd>
+        <dt>Copy domains to exclude</dt>
+        <dd>Enabled only when some domains go through a VPN. Copies those domain names, one per line.</dd>
+        <dt>History folder / Manual</dt>
+        <dd>Opens the folder where history is saved, and this manual.</dd>
+      </dl>
+    </div>
+  </section>
+
+  <section id="levels">
+    <h2>The three results</h2>
+    <div class="levels">
+      <div class="level safe"><span class="name">Safe</span><span class="text">All six domains are reached from a supported country over a regular connection, without a VPN.</span></div>
+      <div class="level warn"><span class="name">Caution</span><span class="text">Some domains go through a VPN, or some domains could not be checked.</span></div>
+      <div class="level bad"><span class="name">Danger</span><span class="text">Claude is reached from an unsupported country, or every domain that could be checked goes through a VPN.</span></div>
+    </div>
+  </section>
+
+  <section id="limits">
+    <h2>When results may be wrong</h2>
+    <p>The app checks using its own network traffic. In the cases below the result may not match Claude's real traffic.</p>
+    <h3>VPNs that exclude by app</h3>
+    <p>NordVPN, ExpressVPN, Proton VPN and similar tools exclude whole apps rather than domains. If you excluded only the Claude app, this checker still goes through the VPN and may show “Danger”.</p>
+    <p>To get an accurate result, exclude <span class="file">回線チェッカー.exe</span> from the VPN together with the Claude app and your browser.</p>
+    <h3>Browser-extension VPNs</h3>
+    <p>VPNs that run as a browser extension only affect the browser. This app cannot see them, so it may show “Safe” even when Claude in the browser goes through a VPN. Turn the extension VPN off when you use Claude in the browser.</p>
+    <h3>Company or school networks</h3>
+    <p>On networks that use an automatic proxy configuration (PAC file) the result may be “Could not check”. Do not change the settings of a VPN managed by your company or school; ask your administrator.</p>
+  </section>
+
+  <section id="fix">
+    <h2>If it isn't safe</h2>
+    <h3>When some domains go through a VPN</h3>
+    <ol class="steps">
+      <li>Click <b>Copy domains to exclude</b>.</li>
+      <li>Open your VPN's exclusion settings and add the domains. See the table below for where to find them.</li>
+      <li>Click <b>Check again</b> and confirm that the result is Safe.</li>
+    </ol>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>VPN software</th><th>Exclusion type</th><th>Where to find it</th></tr></thead>
+        <tbody>
+          <tr><td>AdGuard VPN</td><td>Domain</td><td>Exclusions → Add manually</td></tr>
+          <tr><td>Surfshark</td><td>Domain</td><td>VPN settings → Bypasser → Bypass websites and IPs</td></tr>
+          <tr><td>Windscribe</td><td>Domain</td><td>Preferences → Split Tunneling → Exclusive, then add hostnames</td></tr>
+          <tr><td>Cloudflare WARP</td><td>Domain</td><td>Preferences → Advanced → Split Tunnels</td></tr>
+          <tr><td>NordVPN</td><td>App</td><td>Settings → Split tunneling</td></tr>
+          <tr><td>ExpressVPN</td><td>App</td><td>Options → Split tunneling</td></tr>
+          <tr><td>Proton VPN</td><td>App</td><td>Settings → Split Tunneling</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Menu names can change between versions of the VPN software. For app-based tools, exclude the Claude app, your browser and <span class="file">回線チェッカー.exe</span>.</p>
+    <p>If your VPN says the domain name is invalid, there may be a space before or after it, or it may be typed in full-width characters. Clear the field and paste the name again in half-width characters.</p>
+    <p>If you can't fix it right away, turn the VPN off while you use Claude.</p>
+
+    <h3>When it says “Unsupported country”</h3>
+    <p>Your VPN server is in a country where Claude is not available. Switch to a supported country, or turn the VPN off. Switching countries often can also look suspicious.</p>
+
+    <h3>When it says “Could not check”</h3>
+    <p>Wait a moment and click <b>Check again</b>. If it keeps failing, an ad blocker (such as AdGuard) may be blocking the check. Turn it off temporarily and try again.</p>
+
+    <div class="note">If Claude asks you to verify your identity, do not ignore it. Respond right away.</div>
+  </section>
+
+  <section id="history">
+    <h2>History</h2>
+    <p>Each check adds one line to <span class="file">history.csv</span> in the folder below. The <b>History folder</b> button opens it. You can open the file in Excel.</p>
+    <pre>%LOCALAPPDATA%\KaisenChecker\history.csv</pre>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Column</th><th>Content</th></tr></thead>
+        <tbody>
+          <tr><td>Time</td><td>When the check ran</td></tr>
+          <tr><td>Result</td><td>Safe / Caution / Danger</td></tr>
+          <tr><td>Each domain</td><td>OK / VPN / Unsupported / Unknown</td></tr>
+          <tr><td>VPN software</td><td>Names of VPN software that was running</td></tr>
+          <tr><td>Windows proxy</td><td>On / Off</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>IP addresses, locations and ISP names are never recorded. If the file is open in Excel it can't be saved to, so close it before checking again. Lines written while the app is in English use English words.</p>
+    <p>The same folder also holds your language setting (settings.json) and the last fetched country list (countries.json). Delete this folder as well when you remove the app.</p>
+  </section>
+
+  <section id="antivirus">
+    <h2>If the app won't start</h2>
+    <p>The app is not code-signed, so Windows or your antivirus software may warn about it.</p>
+    <h3>“Windows protected your PC”</h3>
+    <ol class="steps">
+      <li>Click <b>More info</b>.</li>
+      <li>Click <b>Run anyway</b>.</li>
+    </ol>
+    <h3>Windows Defender removed or blocked the file</h3>
+    <ol class="steps">
+      <li>Open <b>Windows Security</b> from the Start menu.</li>
+      <li>Open <b>Virus &amp; threat protection</b>, then <b>Manage settings</b> under “Virus &amp; threat protection settings”.</li>
+      <li>Scroll to <b>Exclusions</b> and choose <b>Add or remove exclusions</b>.</li>
+      <li>Choose <b>Add an exclusion</b> → <b>Folder</b>, and select the extracted app folder.</li>
+      <li>If the file was removed, restore it from <b>Protection history</b>.</li>
+    </ol>
+    <h3>Check that the file is genuine</h3>
+    <p>If the SHA-256 value on the download page matches the value of the zip file you downloaded, it has not been altered. You can check it in PowerShell:</p>
+    <pre>Get-FileHash .\KaisenChecker_v1.1.1.zip -Algorithm SHA256</pre>
+  </section>
+
+  <section id="how">
+    <h2>How it works</h2>
+    <ol class="steps">
+      <li>It connects to Claude's six domains and one comparison site, and reads the address each site sees you coming from.</li>
+      <li>It asks an IP lookup service for the country and whether the address belongs to a VPN or proxy. It uses freeipapi.com first and IP2Location.io if that fails.</li>
+      <li>It fetches the list of supported countries from Anthropic's official page and compares. If that fails it uses the list fetched last time, or the list built into the app (as of 2026-10-10).</li>
+      <li>It looks for running VPN software and reads the Windows proxy setting.</li>
+    </ol>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Domain checked</th><th>Used for</th></tr></thead>
+        <tbody>
+          <tr><td><code>claude.ai</code></td><td>The Claude app and web version</td></tr>
+          <tr><td><code>api.anthropic.com</code></td><td>Claude Code and the API</td></tr>
+          <tr><td><code>console.anthropic.com</code></td><td>Developer console</td></tr>
+          <tr><td><code>claude.com</code></td><td>Official website</td></tr>
+          <tr><td><code>platform.claude.com</code></td><td>Claude Code sign-in and console</td></tr>
+          <tr><td><code>support.claude.com</code></td><td>Support and appeals</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Anthropic does not publish its criteria. The result only shows whether anything looks suspicious.</p>
+  </section>
+
+  <section id="privacy">
+    <h2>Data sent</h2>
+    <ul>
+      <li>The app connects to Claude's six domains, to www.cloudflare.com for comparison, and to Anthropic's supported-countries page.</li>
+      <li>Your public IP address is sent to IP lookup services (freeipapi.com, IP2Location.io) over HTTPS.</li>
+      <li>The IP address is used only for the check. It is never shown or saved.</li>
+      <li>No usage data is sent to the author or to any third party.</li>
+    </ul>
+  </section>
+
+  <section id="disclaimer">
+    <h2>Disclaimer</h2>
+    <ul>
+      <li>This is an unofficial tool. It is not affiliated with, created by or reviewed by Anthropic. “Claude” and “Anthropic” are trademarks of Anthropic.</li>
+      <li>Results are a guide based on information from IP lookup services and public sources. Accuracy is not guaranteed, and the app does not guarantee that your account won't be banned or that a banned account will be restored.</li>
+      <li>The author is not liable for any damage resulting from the use of this app.</li>
+      <li>Check Anthropic's official pages for the terms of use and the list of supported countries.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Files in the folder</h2>
+    <div class="table-wrap">
+      <table>
+        <tbody>
+          <tr><td><span class="file">回線チェッカー.exe</span></td><td>The app</td></tr>
+          <tr><td><span class="file">_internal</span></td><td>Files the app needs to run (do not delete)</td></tr>
+          <tr><td><span class="file">Manual_en.html</span></td><td>This manual (English)</td></tr>
+          <tr><td><span class="file">説明書.html</span></td><td>Manual (Japanese)</td></tr>
+          <tr><td><span class="file">screen_en.png</span> / <span class="file">画面.png</span></td><td>Screenshots used in the manuals</td></tr>
+          <tr><td><span class="file">回線チェッカー取説.exe</span></td><td>Beginner's guide in Japanese (opens in your browser)</td></tr>
+          <tr><td><span class="file">README.md</span> / <span class="file">LICENSE</span></td><td>Overview and license (MIT)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
