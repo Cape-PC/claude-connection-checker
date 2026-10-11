@@ -37,7 +37,7 @@ See `説明書.html` for details (Japanese). Use the button in the top-right cor
 ## ファイルの確認 / Verify the download
 
 ```powershell
-Get-FileHash .\回線チェッカー_v1.1.0.zip -Algorithm SHA256
+Get-FileHash .\KaisenChecker_v1.1.0.zip -Algorithm SHA256
 ```
 
 結果を、配布ページの `SHA256SUMS.txt` と比べてください。 / Compare the result with `SHA256SUMS.txt` on the release page.
