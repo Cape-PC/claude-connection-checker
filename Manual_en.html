@@ -71,7 +71,7 @@ th { color: var(--muted); font-weight: 700; white-space: nowrap; }
     <p class="lang">English · <a href="説明書.html">日本語</a></p>
     <h1>Connection Checker Manual</h1>
     <p class="lead">A Windows 11 app that checks whether your connection to Claude looks risky to Anthropic: whether it goes through a VPN or data center network, and whether you connect from a supported country.</p>
-    <p class="meta">Version 1.1.2 / 2026-10-11</p>
+    <p class="meta">Version 1.2.0 / 2026-10-14</p>
   </header>
 
   <div class="note warn">
@@ -85,6 +85,7 @@ th { color: var(--muted); font-weight: 700; white-space: nowrap; }
       <li><a href="#levels">The three results</a></li>
       <li><a href="#limits">When results may be wrong</a></li>
       <li><a href="#fix">If it isn't safe</a></li>
+      <li><a href="#features">Handy features</a></li>
       <li><a href="#history">History</a></li>
       <li><a href="#antivirus">If the app won't start</a></li>
       <li><a href="#how">How it works</a></li>
@@ -136,6 +137,31 @@ th { color: var(--muted); font-weight: 700; white-space: nowrap; }
       <div class="level warn"><span class="name">Caution</span><span class="text">Some domains go through a VPN, or some domains could not be checked.</span></div>
       <div class="level bad"><span class="name">Danger</span><span class="text">Claude is reached from an unsupported country, or every domain that could be checked goes through a VPN.</span></div>
     </div>
+  <p>These cases also give "Caution": IPv4 and IPv6 take different routes; the two lookup services disagree; or the address could not be read the usual way and the result is an estimate.</p>
+  </section>
+
+  <section id="features">
+    <h2>Handy features</h2>
+    <h3>Keyboard</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Key</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td><code>F5</code></td><td>Check again</td></tr>
+          <tr><td><code>Esc</code></td><td>Close</td></tr>
+          <tr><td><code>Ctrl</code> + <code>+</code> / <code>Ctrl</code> + <code>-</code></td><td>Make the text larger / smaller (0.8x to 1.6x)</td></tr>
+          <tr><td><code>Ctrl</code> + <code>0</code></td><td>Reset the text size</td></tr>
+          <tr><td><code>Ctrl</code> + <code>L</code></td><td>Switch between Japanese and English</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>Check automatically when Windows starts</h3>
+    <p>Turn on "Check automatically when Windows starts" at the bottom of the window and the app checks, without showing a window, every time you sign in. <b>If everything is safe it shows nothing and exits.</b> The window opens only for Caution or Danger, or when it could not connect. Right after startup the network may not be ready, so if it cannot connect it tries again every 20 seconds, up to 3 times.</p>
+    <p>Turn the box off to stop. This setting works with the exe.</p>
+    <h3>Check for a new version</h3>
+    <p>Turn on "Check for a new version" and the app looks up the latest release on GitHub when it starts, and shows a notice at the top if there is a newer one. "Open download page" opens it in your browser. This setting is off by default.</p>
+    <h3>Comparison with last time</h3>
+    <p>The app compares the result with the last one (<code>last.json</code>). If the result changed, it says so at the top of "Why". This helps you notice when, for example, reinstalling your VPN removed your exclusions.</p>
   </section>
 
   <section id="limits">
@@ -146,6 +172,8 @@ th { color: var(--muted); font-weight: 700; white-space: nowrap; }
     <p>To get an accurate result, exclude <span class="file">回線チェッカー.exe</span> from the VPN together with the Claude app and your browser.</p>
     <h3>Browser-extension VPNs</h3>
     <p>VPNs that run as a browser extension only affect the browser. This app cannot see them, so it may show “Safe” even when Claude in the browser goes through a VPN. Turn the extension VPN off when you use Claude in the browser.</p>
+    <h3>IPv6</h3>
+    <p>The app checks both IPv4 and IPv6. If IPv6 is not available it uses IPv4 only. If IPv4 goes through the VPN while IPv6 connects directly (or the other way round), it shows "IPv4 and IPv6 take different routes".</p>
     <h3>Company or school networks</h3>
     <p>On networks that use an automatic proxy configuration (PAC file) the result may be “Could not check”. Do not change the settings of a VPN managed by your company or school; ask your administrator.</p>
   </section>
@@ -223,14 +251,15 @@ th { color: var(--muted); font-weight: 700; white-space: nowrap; }
     </ol>
     <h3>Check that the file is genuine</h3>
     <p>If the SHA-256 value on the download page matches the value of the zip file you downloaded, it has not been altered. You can check it in PowerShell:</p>
-    <pre>Get-FileHash .\KaisenChecker_v1.1.2.zip -Algorithm SHA256</pre>
+    <pre>Get-FileHash .\KaisenChecker_v1.2.0.zip -Algorithm SHA256</pre>
   </section>
 
   <section id="how">
     <h2>How it works</h2>
     <ol class="steps">
-      <li>It connects to Claude's six domains and one comparison site, and reads the address each site sees you coming from.</li>
-      <li>It asks an IP lookup service for the country and whether the address belongs to a VPN or proxy. It uses freeipapi.com first and IP2Location.io if that fails.</li>
+      <li>It connects to Claude's six domains and one comparison site over both IPv4 and IPv6, and reads the address each site sees you coming from. If IPv6 is not available, only IPv4 is used.</li>
+      <li>The domain list is read from a configuration file on GitHub. Only names under <code>claude.ai</code>, <code>anthropic.com</code> and <code>claude.com</code> are used; anything else is ignored.</li>
+      <li>It asks two IP lookup services (freeipapi.com and IP2Location.io) for the country and whether the address belongs to a VPN or proxy, and compares their answers. If they disagree, the result says "Lookup services disagree". If only one answers, that answer is used.</li>
       <li>It fetches the list of supported countries from Anthropic's official page and compares. If that fails it uses the list fetched last time, or the list built into the app (as of 2026-10-10).</li>
       <li>It looks for running VPN software and reads the Windows proxy setting.</li>
     </ol>
@@ -254,7 +283,9 @@ th { color: var(--muted); font-weight: 700; white-space: nowrap; }
     <h2>Data sent</h2>
     <ul>
       <li>The app connects to Claude's six domains, to www.cloudflare.com for comparison, and to Anthropic's supported-countries page.</li>
-      <li>Your public IP address is sent to IP lookup services (freeipapi.com, IP2Location.io) over HTTPS.</li>
+      <li>Only when the normal way of reading your address fails, it connects to api.ipify.org and api6.ipify.org to find it another way.</li>
+      <li>Only when you turn on "Check for a new version", it connects to GitHub (api.github.com) for the latest release information.</li>
+      <li>Your public IP address is sent to both IP lookup services (freeipapi.com, IP2Location.io) over HTTPS.</li>
       <li>The IP address is used only for the check. It is never shown or saved.</li>
       <li>No usage data is sent to the author or to any third party.</li>
     </ul>
