@@ -71,7 +71,7 @@ th { color: var(--muted); font-weight: 700; white-space: nowrap; }
     <p class="meta" style="margin:0 0 8px"><a href="Manual_en.html">English</a> · 日本語</p>
     <h1>回線チェッカー 説明書</h1>
     <p class="lead">このパソコンのネットのつながり方が、<br>Anthropicから見てBANされやすい状態かどうかを判定するWindows 11用のアプリです。</p>
-    <p class="meta">バージョン 1.2.0 ／ 2026-10-14</p>
+    <p class="meta">バージョン 1.3.0 ／ 2026-10-29</p>
   </header>
 
   <div class="note warn">
@@ -160,6 +160,23 @@ th { color: var(--muted); font-weight: 700; white-space: nowrap; }
     <p>やめるときは、<br>チェックを外します。<br>この設定は、<br>このアプリのexeで使えます。</p>
     <h3>新しい版を確認する</h3>
     <p><wbr>「⁠新⁠し⁠い⁠版⁠を⁠確⁠認⁠す⁠る⁠」にチェックを入れると、<br>起動したときにGitHubの最新版を調べて、<br>新しい版があれば画面の上に案内を出します。<br><wbr>「⁠ダ⁠ウ⁠ン⁠ロ⁠ー⁠ド⁠ペ⁠ー⁠ジ⁠を⁠開⁠く⁠」を押すと、<br>ブラウザで開きます。<br>この設定はオフが初期値です。</p>
+    <h3>Claudeアプリ自身の通信を調べる</h3>
+    <p>表のいちばん下の2行に、<br>パソコンで動いている<b>Claudeアプリ・⁠Claude Code</b>と、<b>ブラウザからClaudeへ</b>の、<br>実際の通信の結果を出します。</p>
+    <p>このパソコンの接続の一覧を読んで、<br>Claudeの通信が、<br>VPN用の仮想アダプターから出ているか、<br>ふつうのアダプター（有線LANやWi-Fi）から出ているかを調べます。<br>アプリ単位でVPNから外している場合でも、<br>実際の様子がわかります。</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>表示</th><th>意味</th></tr></thead>
+        <tbody>
+          <tr><td>VPNを通っていません（問題なし）</td><td>Claudeの通信は、<br>ふつうのアダプターから出ています。</td></tr>
+          <tr><td>VPNを通っています</td><td>VPN用のアダプターから出ています。<br>除外の設定が効いていないか、<br>除外していません。<br>結論は<wbr>「⁠要⁠注⁠意⁠」になります。</td></tr>
+          <tr><td>一部がVPNを通っています</td><td>通信によって、<br>経路が違います。</td></tr>
+          <tr><td>通信が見つかりません</td><td>Claudeアプリが起動していないか、<br>通信していません。</td></tr>
+          <tr><td>確認できませんでした（パソコン内の中継経由の可能性）</td><td>広告ブロッカーやセキュリティソフトなどが通信を中継していて、<br>外への接続が見えませんでした。<br>ほかの行の結果を見てください。</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>調べられるのは、<br>TCPの通信です。<br>ブラウザがQUIC（UDPを使う通信）で接続している場合は、<br>見えません。<br>ブラウザの結果は、<br>Claudeの接続先に対する通信だけを数えます。</p>
+    <p>接続の一覧は、<br>判定のためだけに読み、<br>画面にも履歴にも、<br>保存も送信もしません。</p>
     <h3>前回との比較</h3>
     <p>前回の結果（<code>last.json</code>）と比べて、<br>結論が変わったときは、<br><wbr>「⁠理⁠由⁠」の先頭にそのことを書きます。<br>VPNを入れ直して除外が消えたときなどに、<br>すぐ気づけます。</p>
   </section>
@@ -170,6 +187,7 @@ th { color: var(--muted); font-weight: 700; white-space: nowrap; }
     <h3>アプリ単位で除外するVPN</h3>
     <p>NordVPN、<br>ExpressVPN、<br>Proton VPNなどは、<br>ドメインではなくアプリ単位でVPNから外す方式です。<br>Claudeのアプリだけを外していると、<br>回線チェッカー自身はVPNを通るので、<br>結果は<wbr>「⁠危⁠険⁠」になります。</p>
     <p>正しく判定するには、<br>Claudeのアプリやブラウザと一緒に、<span class="file">回線チェッカー.exe</span>もVPNから外してください。</p>
+    <p><b>v1.3.0から：</b>Claudeアプリ・⁠Claude Codeの実際の通信を調べて、<br>アプリ単位でVPNから外している場合でも、<br>結果を見直すようになりました。<br>チェッカー自身はVPNを通っていて、<br>Claudeアプリは直接つながっているときは、<br><wbr>「⁠危⁠険⁠」を<wbr>「⁠要⁠注⁠意⁠」に下げて、<br>そのことを説明します。<br>くわしくは<wbr>「⁠便⁠利⁠な⁠機⁠能⁠」の<wbr>「⁠C⁠l⁠a⁠u⁠d⁠e⁠ア⁠プ⁠リ⁠自⁠身⁠の⁠通⁠信⁠を⁠調⁠べ⁠る⁠」を見てください。</p>
     <h3>ブラウザの拡張機能のVPN</h3>
     <p>Chromeなどの拡張機能として動くVPNは、<br>ブラウザの通信だけを通します。<br>このアプリからは見えないので、<br>ブラウザ版のClaudeがVPNを通っていても<wbr>「⁠安⁠全⁠」と出ます。<br>ブラウザ版のClaudeを使うときは、<br>拡張機能のVPNをオフにしてください。</p>
     <h3>IPv6</h3>
@@ -251,7 +269,7 @@ th { color: var(--muted); font-weight: 700; white-space: nowrap; }
     </ol>
     <h3>ファイルが本物か確かめる</h3>
     <p>配布ページに載っているSHA-256の値と、<br>ダウンロードしたzipファイルの値が同じなら、<br>途中で書き換えられていません。<br>PowerShellで次のように確かめられます。</p>
-    <pre>Get-FileHash .\KaisenChecker_v1.2.0.zip -Algorithm SHA256</pre>
+    <pre>Get-FileHash .\KaisenChecker_v1.3.0.zip -Algorithm SHA256</pre>
   </section>
 
   <section id="how">
@@ -287,6 +305,7 @@ th { color: var(--muted); font-weight: 700; white-space: nowrap; }
       <li><wbr>「⁠新⁠し⁠い⁠版⁠を⁠確⁠認⁠す⁠る⁠」をオンにしたときだけ、<br>GitHubの最新版の情報（api.github.com）に接続します。</li>
       <li>接続元のIPアドレスを、<br>IP判定サービス（freeipapi.com、<br>IP2Location.io）の両方に送ります。<br>通信はすべてHTTPSで暗号化されます。</li>
       <li>IPアドレスは判定にだけ使い、<br>画面にも履歴にも残しません。</li>
+      <li>Claudeアプリの実際の通信を調べるために、<br>このパソコンの接続の一覧（どのアプリが、<br>どのネットワークから通信しているか）を読みます。<br>読むだけで、<br>変更はしません。<br>保存も送信もしません。</li>
       <li>作者や第三者に、<br>利用状況を送ることはありません。</li>
     </ul>
   </section>

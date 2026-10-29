@@ -71,7 +71,7 @@ th { color: var(--muted); font-weight: 700; white-space: nowrap; }
     <p class="lang">English · <a href="説明書.html">日本語</a></p>
     <h1>Connection Checker Manual</h1>
     <p class="lead">A Windows 11 app that checks whether your connection to Claude looks risky to Anthropic: whether it goes through a VPN or data center network, and whether you connect from a supported country.</p>
-    <p class="meta">Version 1.2.0 / 2026-10-14</p>
+    <p class="meta">Version 1.3.0 / 2026-10-29</p>
   </header>
 
   <div class="note warn">
@@ -160,6 +160,23 @@ th { color: var(--muted); font-weight: 700; white-space: nowrap; }
     <p>Turn the box off to stop. This setting works with the exe.</p>
     <h3>Check for a new version</h3>
     <p>Turn on "Check for a new version" and the app looks up the latest release on GitHub when it starts, and shows a notice at the top if there is a newer one. "Open download page" opens it in your browser. This setting is off by default.</p>
+    <h3>Check the Claude app's own traffic</h3>
+    <p>The last two rows of the table show the result of looking at the actual connections of the <b>Claude app / Claude Code</b> running on your PC, and of your <b>browser to Claude</b>.</p>
+    <p>The app reads the list of connections on this PC and checks whether Claude's traffic leaves through a VPN's virtual adapter or through a regular adapter (wired LAN or Wi-Fi). This shows the real picture even when you exclude apps from the VPN.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Shown</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td>Not through a VPN (OK)</td><td>Claude's traffic leaves through a regular adapter.</td></tr>
+          <tr><td>Goes through a VPN</td><td>It leaves through a VPN adapter. Your exclusion is not working or has not been set. The result becomes "Caution".</td></tr>
+          <tr><td>Partly through a VPN</td><td>Some connections take a different route.</td></tr>
+          <tr><td>No traffic found</td><td>The Claude app is not running or is not connected.</td></tr>
+          <tr><td>Could not tell (may go through a local proxy)</td><td>An ad blocker, security software or similar relays the traffic, so the outgoing connection was not visible. Rely on the other rows.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Only TCP connections can be seen. Browser traffic over QUIC (which uses UDP) is not visible. For the browser, only connections to Claude's addresses are counted.</p>
+    <p>The connection list is read only for the check. It is never shown, saved or sent.</p>
     <h3>Comparison with last time</h3>
     <p>The app compares the result with the last one (<code>last.json</code>). If the result changed, it says so at the top of "Why". This helps you notice when, for example, reinstalling your VPN removed your exclusions.</p>
   </section>
@@ -170,6 +187,7 @@ th { color: var(--muted); font-weight: 700; white-space: nowrap; }
     <h3>VPNs that exclude by app</h3>
     <p>NordVPN, ExpressVPN, Proton VPN and similar tools exclude whole apps rather than domains. If you excluded only the Claude app, this checker still goes through the VPN and may show “Danger”.</p>
     <p>To get an accurate result, exclude <span class="file">回線チェッカー.exe</span> from the VPN together with the Claude app and your browser.</p>
+    <p><b>Since v1.3.0:</b> the app also looks at the actual connections of the Claude app and Claude Code, so it can review the result even when you exclude apps from the VPN. If this checker goes through the VPN while the Claude app connects directly, "Danger" is lowered to "Caution" and the app explains why. See "Check the Claude app's own traffic" under Handy features.</p>
     <h3>Browser-extension VPNs</h3>
     <p>VPNs that run as a browser extension only affect the browser. This app cannot see them, so it may show “Safe” even when Claude in the browser goes through a VPN. Turn the extension VPN off when you use Claude in the browser.</p>
     <h3>IPv6</h3>
@@ -251,7 +269,7 @@ th { color: var(--muted); font-weight: 700; white-space: nowrap; }
     </ol>
     <h3>Check that the file is genuine</h3>
     <p>If the SHA-256 value on the download page matches the value of the zip file you downloaded, it has not been altered. You can check it in PowerShell:</p>
-    <pre>Get-FileHash .\KaisenChecker_v1.2.0.zip -Algorithm SHA256</pre>
+    <pre>Get-FileHash .\KaisenChecker_v1.3.0.zip -Algorithm SHA256</pre>
   </section>
 
   <section id="how">
@@ -287,6 +305,7 @@ th { color: var(--muted); font-weight: 700; white-space: nowrap; }
       <li>Only when you turn on "Check for a new version", it connects to GitHub (api.github.com) for the latest release information.</li>
       <li>Your public IP address is sent to both IP lookup services (freeipapi.com, IP2Location.io) over HTTPS.</li>
       <li>The IP address is used only for the check. It is never shown or saved.</li>
+      <li>To check the Claude app's actual traffic, the app reads the list of connections on this PC (which app connects through which network). It only reads; it changes nothing, and nothing is saved or sent.</li>
       <li>No usage data is sent to the author or to any third party.</li>
     </ul>
   </section>

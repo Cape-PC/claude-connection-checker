@@ -10,7 +10,9 @@ import csv
 import ctypes
 import datetime
 import html
+import base64
 import http.client
+import ipaddress
 import json
 import os
 import re
@@ -28,7 +30,7 @@ from tkinter import ttk
 
 APP_NAME_JA = "回線チェッカー"
 APP_NAME_EN = "Connection Checker"
-VERSION = "1.2.0"
+VERSION = "1.3.0"
 
 # 設定ファイルを置いた URL（GitHub の raw URL など）。空なら組み込みのドメイン一覧だけを使う。
 # 形式: {"domains": ["claude.ai", ...]}
@@ -208,7 +210,7 @@ TEXT = {
         "src_cache": "国の一覧：前回取得した一覧（{d}）",
         "src_builtin": "国の一覧：組み込み（{d}時点）",
         "notice": "非公式ツールです。Anthropic社とは関係ありません。判定は目安で、BANされないことを保証しません。\n"
-                  "アプリ単位で除外するVPNと、ブラウザ拡張のVPNは正しく判定できません。",
+                  "ブラウザ拡張のVPNは判定できません。Claudeアプリの通信は、実際の接続を調べます。",
         "csv_header": ["日時", "結論"],
         "csv_vpnsoft": "VPNソフト", "csv_proxy": "Windowsプロキシ", "on": "オン", "off": "オフ", "none": "なし",
         "sep": "、",
@@ -258,7 +260,7 @@ TEXT = {
         "src_cache": "Country list: last fetched copy ({d})",
         "src_builtin": "Country list: built-in (as of {d})",
         "notice": "Unofficial tool, not affiliated with Anthropic. Results are a guide only and do not guarantee you won't be banned.\n"
-                  "Per-app VPN exclusions and browser-extension VPNs cannot be checked accurately.",
+                  "Browser-extension VPNs cannot be detected. The Claude app's traffic is checked from its actual connections.",
         "csv_header": ["Time", "Result"],
         "csv_vpnsoft": "VPN software", "csv_proxy": "Windows proxy", "on": "On", "off": "Off", "none": "None",
         "sep": ", ",
@@ -309,6 +311,47 @@ TEXT["en"].update({
     "autostart_failed": "Could not change the startup check setting.",
     "autostart_unavailable": "The startup check works with the exe.",
     "checking_row": "Checking…",
+})
+
+TEXT["ja"].update({
+    "row_app": "（実際の通信）Claudeアプリ・Claude Code",
+    "row_browser": "（実際の通信）ブラウザからClaude",
+    "app_none": "通信が見つかりません",
+    "app_direct": "VPNを通っていません（問題なし）",
+    "app_vpn": "VPNを通っています",
+    "app_mixed": "一部がVPNを通っています",
+    "app_unknown": "確認できませんでした",
+    "app_proxied": "確認できませんでした（パソコン内の中継経由の可能性）",
+    "r_app_proxied": "{names}の通信は、このパソコン内の中継（広告ブロッカーやセキュリティソフトなど）を通っているようで、VPNを通るかどうかを調べられませんでした。",
+    "grp_app": "Claudeアプリ・Claude Code",
+    "grp_browser": "ブラウザ（Claude向けの通信）",
+    "r_app_none": "Claudeアプリ・Claude Code・ブラウザの、Claudeへの通信は見つかりませんでした（起動していないか、通信していません）。",
+    "r_app_vpn": "実際の通信を調べたところ、{names}がVPN用のアダプターを通っています。除外の設定が効いていないか、除外していません。",
+    "r_app_direct": "実際の通信を調べたところ、{names}はVPNを通らず、直接つながっています。",
+    "r_app_mismatch": "回線チェッカー自身はVPNを通っていますが、{names}は直接つながっています。アプリ単位でVPNから外しているときに起きる、ふつうの状態です。実際の通信は、問題ない可能性が高いです。",
+    "a_app_vpn": "Claudeアプリ・Claude Code・ブラウザを、VPNの除外に追加してください。アプリ単位で外すVPNでは、claude.exe（Claudeアプリ）などを選びます。",
+    "a_app_mismatch": "回線チェッカー.exe もVPNの除外に追加すると、結果が実際の通信と合います。",
+    "notice_app": "ブラウザ拡張のVPNは判定できません。Claudeアプリの通信は、実際の接続を調べます。",
+})
+TEXT["en"].update({
+    "row_app": "(Actual traffic) Claude app / Claude Code",
+    "row_browser": "(Actual traffic) Browser to Claude",
+    "app_none": "No traffic found",
+    "app_direct": "Not through a VPN (OK)",
+    "app_vpn": "Goes through a VPN",
+    "app_mixed": "Partly through a VPN",
+    "app_unknown": "Could not check",
+    "app_proxied": "Could not tell (may go through a local proxy)",
+    "r_app_proxied": "{names} seem to go through a relay on this PC (such as an ad blocker or security software), so we could not tell whether they use the VPN.",
+    "grp_app": "Claude app / Claude Code",
+    "grp_browser": "Browser (traffic to Claude)",
+    "r_app_none": "No traffic to Claude was found from the Claude app, Claude Code or a browser (they may not be running, or not connected).",
+    "r_app_vpn": "Looking at the actual connections, {names} go through a VPN adapter. Your exclusion is not working, or has not been set.",
+    "r_app_direct": "Looking at the actual connections, {names} connect directly, not through a VPN.",
+    "r_app_mismatch": "This checker goes through the VPN, but {names} connect directly. That is normal when you exclude apps from the VPN. Your real traffic is probably fine.",
+    "a_app_vpn": "Add the Claude app, Claude Code and your browser to the VPN's exclusions. With VPNs that exclude by app, choose claude.exe (the Claude app) and the like.",
+    "a_app_mismatch": "Also add this checker (回線チェッカー.exe) to the VPN's exclusions and the result will match your real traffic.",
+    "notice_app": "Browser-extension VPNs cannot be detected. The Claude app's traffic is checked from its actual connections.",
 })
 
 # 取得先として許す系列。設定ファイルが書き換えられても、これ以外のサイトには接続しない。
@@ -612,6 +655,137 @@ def set_autostart(on):
                 pass
 
 
+
+# ---------------------------------------------------------------- Claudeアプリ自身の通信
+
+APP_PROC_NAMES = {"claude.exe"}
+SCRIPT_HOSTS = {"node.exe", "bun.exe", "deno.exe"}  # コマンドに "claude" を含むものだけを Claude Code として数える
+BROWSER_NAMES = {"chrome.exe", "msedge.exe", "firefox.exe", "brave.exe", "opera.exe", "vivaldi.exe", "arc.exe"}
+VPN_ADAPTER_WORDS = (
+    "wintun", "tap-windows", "tap0901", "wireguard", "openvpn", "adguard", "nord", "proton", "surfshark",
+    "express", "mullvad", "windscribe", "warp", "cloudflare", "tailscale", "zerotier", "vpn", "forti",
+    "anyconnect", "cisco", "pangp", "globalprotect", "softether", "private internet", "cyberghost",
+    "tunnelbear", "hotspot shield", "hide.me", "strongvpn", "ivpn", "pia ",
+)
+NOT_VPN_WORDS = ("hyper-v", "vethernet", "wsl", "vmware", "virtualbox", "loopback", "bluetooth",
+                 "wi-fi direct", "miniport", "isatap", "teredo", "6to4", "kernel debug")
+
+# このパソコンの接続一覧を読むだけ。何も変更しない。
+_PS_SCRIPT = r"""
+$ErrorActionPreference = 'SilentlyContinue'
+[Console]::OutputEncoding = [Text.Encoding]::UTF8
+$procs = @(Get-CimInstance Win32_Process | ForEach-Object {
+  $cmd = $null
+  if ($_.Name -match '^(node|bun|deno)\.exe$') { $cmd = $_.CommandLine }
+  [pscustomobject]@{ pid = [int]$_.ProcessId; name = $_.Name; cmd = $cmd } })
+$conns = @(Get-NetTCPConnection -State Established | ForEach-Object {
+  [pscustomobject]@{ la = $_.LocalAddress; ra = $_.RemoteAddress; pid = [int]$_.OwningProcess } })
+$ips = @(Get-NetIPAddress | ForEach-Object { [pscustomobject]@{ ip = $_.IPAddress; idx = [int]$_.InterfaceIndex } })
+$ads = @(Get-NetAdapter -IncludeHidden | ForEach-Object {
+  [pscustomobject]@{ idx = [int]$_.ifIndex; name = $_.Name; desc = $_.InterfaceDescription; hw = [bool]$_.HardwareInterface } })
+[pscustomobject]@{ procs = $procs; conns = $conns; ips = $ips; ads = $ads } | ConvertTo-Json -Depth 4 -Compress
+"""
+
+
+def _listify(x):
+    if x is None:
+        return []
+    return x if isinstance(x, list) else [x]
+
+
+def gather_connection_data():
+    encoded = base64.b64encode(_PS_SCRIPT.encode("utf-16-le")).decode("ascii")
+    out = subprocess.run(
+        ["powershell.exe", "-NoProfile", "-NonInteractive", "-EncodedCommand", encoded],
+        capture_output=True, creationflags=subprocess.CREATE_NO_WINDOW, timeout=45,
+    ).stdout
+    return json.loads(out.decode("utf-8-sig"))
+
+
+def resolve_claude_ips(domains):
+    ips = set()
+    for d in domains:
+        try:
+            for info in socket.getaddrinfo(d, 443, proto=socket.IPPROTO_TCP):
+                ips.add(info[4][0].split("%")[0])
+        except OSError:
+            pass
+    return ips
+
+
+def adapter_is_vpn(ad):
+    """アダプターが VPN 用の仮想アダプターらしいか。分からなければ None。"""
+    if not ad:
+        return None
+    text = f"{ad.get('name', '')} {ad.get('desc', '')}".lower()
+    if any(w in text for w in NOT_VPN_WORDS):
+        return False
+    if any(w in text for w in VPN_ADAPTER_WORDS):
+        return True
+    return not ad.get("hw", True)  # 物理ではないアダプターは、VPN の可能性が高い
+
+
+def _is_public(ip):
+    try:
+        return ipaddress.ip_address(str(ip).split("%")[0]).is_global
+    except ValueError:
+        return False
+
+
+def _group_status(counts):
+    if counts["vpn"] == 0 and counts["direct"] == 0:
+        # 外への接続が見えず、パソコン内への接続だけがあるときは、中継（広告ブロッカー等）を通っている可能性がある
+        return "proxied" if counts.get("local", 0) > 0 else "none"
+    if counts["vpn"] == 0:
+        return "direct"
+    if counts["direct"] == 0:
+        return "vpn"
+    return "mixed"
+
+
+def analyze_app_traffic(data, claude_ips):
+    """Claude の通信が、VPN 用のアダプターと、ふつうのアダプターの、どちらから出ているかを数える。
+    IP アドレスは数えるためだけに使い、結果には入れない。"""
+    adapters = {int(a["idx"]): a for a in _listify(data.get("ads"))}
+    ip_idx = {str(i["ip"]).split("%")[0]: int(i["idx"]) for i in _listify(data.get("ips"))}
+    procs = {int(p["pid"]): p for p in _listify(data.get("procs"))}
+    groups = {"app": {"vpn": 0, "direct": 0, "local": 0}, "browser": {"vpn": 0, "direct": 0, "local": 0}}
+    for c in _listify(data.get("conns")):
+        remote = str(c.get("ra", "")).split("%")[0]
+        proc = procs.get(int(c.get("pid", -1)))
+        if not proc:
+            continue
+        name = (proc.get("name") or "").lower()
+        cmd = (proc.get("cmd") or "").lower()
+        is_app = name in APP_PROC_NAMES or (name in SCRIPT_HOSTS and "claude" in cmd)
+        if not _is_public(remote):
+            try:
+                if is_app and ipaddress.ip_address(remote).is_loopback:
+                    groups["app"]["local"] += 1
+            except ValueError:
+                pass
+            continue
+        if is_app:
+            group = "app"
+        elif name in BROWSER_NAMES and remote in claude_ips:
+            group = "browser"
+        else:
+            continue
+        is_vpn = adapter_is_vpn(adapters.get(ip_idx.get(str(c.get("la", "")).split("%")[0])))
+        if is_vpn is None:
+            continue
+        groups[group]["vpn" if is_vpn else "direct"] += 1
+    return {g: {"status": _group_status(v), "vpn": v["vpn"], "direct": v["direct"], "local": v["local"]} for g, v in groups.items()}
+
+
+def check_app_traffic(domains):
+    """Claude アプリ・Claude Code・ブラウザの、実際の通信を調べる。調べられなければ None。"""
+    try:
+        return analyze_app_traffic(gather_connection_data(), resolve_claude_ips(domains))
+    except Exception:  # noqa: BLE001
+        return None
+
+
 # ---------------------------------------------------------------- 判定
 
 def classify(info, supported):
@@ -708,9 +882,10 @@ def run_check(progress=None, on_domains=None):
                 fut = cache[ip] = lookup_pool.submit(lookup_ip, ip)
         return fut.result()
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=len(hosts) + 2) as ex:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=len(hosts) + 3) as ex:
         f_countries = ex.submit(get_supported_countries)
         f_vpn = ex.submit(detect_vpn_software)
+        f_apps = ex.submit(check_app_traffic, domains)
         futures = {ex.submit(check_host, h, f_countries, lookup, errors): h for h in hosts}
         rows = {}
         for f in concurrent.futures.as_completed(futures):
@@ -725,6 +900,7 @@ def run_check(progress=None, on_domains=None):
                 progress(row)
         _, country_src, country_date = f_countries.result()
         vpn_software = f_vpn.result()
+        apps = f_apps.result()
     lookup_pool.shutdown(wait=False)
     cache.clear()  # IP はここで捨てる
 
@@ -740,6 +916,20 @@ def run_check(progress=None, on_domains=None):
     else:
         level = SAFE
 
+    # 実際の通信（Claudeアプリ・Claude Code・ブラウザ）の結果で、判定を見直す
+    app_adjust = None
+    if apps:
+        active = [g for g in apps.values() if g["status"] != "none"]
+        any_vpn = any(g["status"] in ("vpn", "mixed") for g in active)
+        all_direct = bool(active) and all(g["status"] == "direct" for g in active)
+        if any_vpn and level == SAFE:
+            level = CAUTION
+        if all_direct and level == DANGER and OUTSIDE not in statuses:
+            level = CAUTION  # チェッカーだけがVPNを通っていて、実際の通信は直接つながっている
+            app_adjust = "downgraded"
+        elif all_direct and VPN in statuses:
+            app_adjust = "mismatch"
+
     return {
         "time": datetime.datetime.now(),
         "level": level,
@@ -752,6 +942,8 @@ def run_check(progress=None, on_domains=None):
         "country_src": country_src,
         "country_date": country_date,
         "prev": None,
+        "apps": apps,
+        "app_adjust": app_adjust,
     }
 
 
@@ -825,6 +1017,23 @@ def build_explanation(result, lang):
         reasons.append(t["r_conflict"].format(n=len(conflict)))
     if result["blocked_hint"]:
         reasons.append(t["r_blocked"])
+    apps = result.get("apps")
+    app_adjust = result.get("app_adjust")
+    app_vpn_names, app_direct_names = [], []
+    if apps:
+        app_vpn_names = [t["grp_" + k] for k, g in apps.items() if g["status"] in ("vpn", "mixed")]
+        app_direct_names = [t["grp_" + k] for k, g in apps.items() if g["status"] == "direct"]
+        if all(g["status"] == "none" for g in apps.values()):
+            reasons.append(t["r_app_none"])
+        proxied = [t["grp_" + k] for k, g in apps.items() if g["status"] == "proxied"]
+        if proxied:
+            reasons.append(t["r_app_proxied"].format(names=t["sep"].join(proxied)))
+        if app_vpn_names:
+            reasons.append(t["r_app_vpn"].format(names=t["sep"].join(app_vpn_names)))
+        if app_adjust and app_direct_names:
+            reasons.append(t["r_app_mismatch"].format(names=t["sep"].join(app_direct_names)))
+        elif app_direct_names:
+            reasons.append(t["r_app_direct"].format(names=t["sep"].join(app_direct_names)))
     if software:
         if result["baseline"]["status"] == VPN and not vpn_rows and not outside_rows:
             reasons.append(t["r_split_ok"].format(names=names))
@@ -856,6 +1065,10 @@ def build_explanation(result, lang):
         actions.append(t["a_conflict"])
     if level == SAFE:
         actions.append(t["a_safe"])
+    if app_vpn_names:
+        actions.append(t["a_app_vpn"])
+    if app_adjust:
+        actions.append(t["a_app_mismatch"])
     actions.append(t["a_verify"])
 
     return headline, reasons, actions
@@ -952,7 +1165,8 @@ class App:
         self.fonts = {n: tkfont.Font(family=FONT, size=s, weight=w) for n, (s, w) in FONT_SPECS.items()}
 
         root.configure(bg=c["bg"])
-        root.geometry("800x900")
+        height = min(980, max(700, root.winfo_screenheight() - 80))
+        root.geometry(f"800x{height}")
         root.minsize(640, 700)
         if background:
             root.withdraw()
@@ -986,7 +1200,7 @@ class App:
         self.style.theme_use("clam")
         self.tree = ttk.Treeview(outer, columns=("domain", "country", "status"), show="headings",
                                  height=len(DEFAULT_DOMAINS) + 1, style="K.Treeview", selectmode="none")
-        for col, width in (("domain", 210), ("country", 130), ("status", 330)):
+        for col, width in (("domain", 300), ("country", 90), ("status", 340)):
             self.tree.column(col, width=width, anchor="w")
         self.tree.tag_configure(OK, foreground=c[SAFE][0])
         self.tree.tag_configure(VPN, foreground=c[CAUTION][0])
@@ -998,12 +1212,17 @@ class App:
         self.source = tk.Label(outer, font=self.fonts["small"], bg=c["bg"], fg=c["muted"], anchor="w")
         self.source.pack(fill="x", pady=(0, 8))
 
-        self.text = tk.Text(outer, font=self.fonts["body"], wrap="char", bg=c["panel"], fg=c["fg"],
+        text_frame = tk.Frame(outer, bg=c["bg"])
+        text_frame.pack(fill="both", expand=True)
+        self.text = tk.Text(text_frame, font=self.fonts["body"], wrap="char", bg=c["panel"], fg=c["fg"],
                             relief="flat", padx=12, pady=10, highlightthickness=1,
                             highlightbackground=c["line"], height=10, insertbackground=c["fg"])
         self.text.tag_configure("h", font=self.fonts["heading"], spacing1=4, spacing3=4)
         self.text.tag_configure("p", lmargin1=8, lmargin2=22, spacing3=3)
-        self.text.pack(fill="both", expand=True)
+        scroll = ttk.Scrollbar(text_frame, orient="vertical", command=self.text.yview)
+        self.text.configure(yscrollcommand=scroll.set)
+        scroll.pack(side="right", fill="y")
+        self.text.pack(side="left", fill="both", expand=True)
 
         self.notice = tk.Label(outer, font=self.fonts["small"], bg=c["bg"], fg=c["muted"],
                                justify="left", anchor="w")
@@ -1192,9 +1411,11 @@ class App:
 
     def _placeholder_rows(self, domains):
         self.tree.delete(*self.tree.get_children())
-        self.tree.configure(height=len(domains) + 1)
-        for d in domains + [BASELINE_DOMAIN]:
-            name = self.t("baseline") if d == BASELINE_DOMAIN else d
+        self.tree.configure(height=len(domains) + 3)
+        for d in domains + [BASELINE_DOMAIN, "__app__", "__browser__"]:
+            name = (self.t("baseline") if d == BASELINE_DOMAIN else
+                    self.t("row_app") if d == "__app__" else
+                    self.t("row_browser") if d == "__browser__" else d)
             self.tree.insert("", "end", iid=d, values=(name, "—", self.t("checking_row")),
                              tags=("base" if d == BASELINE_DOMAIN else "pending",))
 
@@ -1244,13 +1465,22 @@ class App:
         self.set_banner(CAUTION if result["all_failed"] else result["level"], headline)
 
         self.tree.delete(*self.tree.get_children())
-        self.tree.configure(height=len(result["rows"]) + 1)
+        self.tree.configure(height=len(result["rows"]) + 3)
         for r in result["rows"]:
             country, status = row_values(r, self.lang)
             self.tree.insert("", "end", iid=r["domain"], values=(r["domain"], country, status), tags=(r["status"],))
         b = result["baseline"]
         country, status = row_values(b, self.lang)
         self.tree.insert("", "end", iid=BASELINE_DOMAIN, values=(self.t("baseline"), country, status), tags=("base",))
+        apps = result.get("apps")
+        for key in ("app", "browser"):
+            if apps is None:
+                state, tag = "app_unknown", "base"
+            else:
+                st = apps[key]["status"]
+                state = "app_" + st
+                tag = {"direct": OK, "vpn": VPN, "mixed": VPN}.get(st, "base")  # none / proxied は薄い色
+            self.tree.insert("", "end", iid="__" + key + "__", values=(self.t("row_" + key), "—", self.t(state)), tags=(tag,))
         self.source.config(text=self.t("src_" + result["country_src"]).format(d=result["country_date"]))
 
         self.text.config(state="normal")
