@@ -1617,22 +1617,35 @@ class Mascot(tk.Canvas):
 
     def __init__(self, master, bg, image_paths=(), scale=0.72):
         self._scale, self._mood = scale, "happy"
-        self._w, self._h = int(self.W * scale), int(self.H * scale)
-        super().__init__(master, width=self._w, height=self._h, bg=bg, highlightthickness=0, bd=0)
+        self._mw, self._mh = int(self.W * scale), int(self.H * scale)
+        super().__init__(master, width=self._mw, height=self._mh, bg=bg, highlightthickness=0, bd=0)
         self._image = None
         for path in image_paths:
             if os.path.exists(path):
                 try:
-                    img = tk.PhotoImage(file=path)
-                    factor = max(1, -(-img.height() // self._h), -(-img.width() // self._w))
-                    self._image = img.subsample(factor, factor) if factor > 1 else img
+                    self._image = self._fit(tk.PhotoImage(file=path), self._mw, self._mh)
                     break
                 except tk.TclError:
                     self._image = None
         if self._image is not None:
-            self.create_image(self._w / 2, self._h, image=self._image, anchor="s")
+            self.create_image(self._mw / 2, self._mh, image=self._image, anchor="s")
         else:
             self._redraw()
+
+    @staticmethod
+    def _fit(img, max_w, max_h):
+        """枠に収まる、いちばん大きい大きさに縮める（拡大はしない）。zoom と subsample を組み合わせて、倍率を細かく選ぶ。"""
+        best = None
+        for z in range(1, 9):
+            for sub in range(z, 61):
+                w, h = img.width() * z // sub, img.height() * z // sub
+                if 0 < w <= max_w and 0 < h <= max_h and (best is None or w * h > best[0]):
+                    best = (w * h, z, sub)
+        if best is None:
+            return img
+        _, z, sub = best
+        out = img.zoom(z, z) if z > 1 else img
+        return out.subsample(sub, sub) if sub > 1 else out
 
     def set_mood(self, mood):
         if self._image is None and mood != self._mood:
