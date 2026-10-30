@@ -30,7 +30,7 @@ from tkinter import ttk
 
 APP_NAME_JA = "回線チェッカー"
 APP_NAME_EN = "Connection Checker"
-VERSION = "1.3.0"
+VERSION = "1.4.0"
 
 # 設定ファイルを置いた URL（GitHub の raw URL など）。空なら組み込みのドメイン一覧だけを使う。
 # 形式: {"domains": ["claude.ai", ...]}
@@ -1100,6 +1100,101 @@ def save_history(result, lang):
 
 # ---------------------------------------------------------------- 画面
 
+TEXT["ja"].update({
+    "btn_view_friendly": "やさしい表示",
+    "btn_view_standard": "ふつうの表示",
+    "fr_tagline": "Claudeにつなぐネットが、BANされにくい状態かを、やさしくチェックします。",
+    "fr_head_safe": "だいじょうぶ！　安心して使えます",
+    "fr_sub_safe": "BANされやすい接続ではありません。",
+    "fr_head_caution": "ちょっと気をつけてください",
+    "fr_sub_caution": "気になるところが見つかりました。下の「やること」を見てください。",
+    "fr_head_danger": "あぶない状態です",
+    "fr_sub_danger": "BANされやすい接続です。下の「やること」を、すぐにやってください。",
+    "fr_head_failed": "うまくチェックできませんでした",
+    "fr_sub_failed": "ネットにつながっているかを、確かめてください。",
+    "fr_head_checking": "チェックしています…",
+    "fr_sub_checking": "数秒かかります。",
+    "fr_card_places": "しらべた場所",
+    "fr_card_why": "どうして？",
+    "fr_card_todo": "やること",
+    "fr_card_words": "ことばの説明",
+    "fr_s_ok": "ふつうの回線でつながっています",
+    "fr_s_vpn": "VPNを通っています",
+    "fr_s_outside": "Claudeを使えない国からつながっています",
+    "fr_s_unknown": "確認できませんでした",
+    "fr_app_direct": "VPNを通らず、直接つながっています",
+    "fr_app_vpn": "VPNを通っています",
+    "fr_app_mixed": "一部がVPNを通っています",
+    "fr_app_none": "通信が見つかりません",
+    "fr_app_proxied": "確認できませんでした（中継を通っているかも）",
+    "fr_app_unknown": "確認できませんでした",
+    "fr_baseline": "ほかのサイト（くらべる用）",
+    "fr_row_app": "Claudeアプリ・Claude Code（実際の通信）",
+    "fr_row_browser": "ブラウザからClaude（実際の通信）",
+    "fr_pending": "しらべています…",
+})
+TEXT["en"].update({
+    "btn_view_friendly": "Friendly view",
+    "btn_view_standard": "Standard view",
+    "fr_tagline": "A gentle check of whether your connection to Claude is safe from bans.",
+    "fr_head_safe": "You're all set!",
+    "fr_sub_safe": "This connection is unlikely to get you banned.",
+    "fr_head_caution": "Please take a look",
+    "fr_sub_caution": "We found something to check. See \"What to do\" below.",
+    "fr_head_danger": "This is risky",
+    "fr_sub_danger": "This connection is likely to get you banned. Please do the steps below right away.",
+    "fr_head_failed": "We couldn't check",
+    "fr_sub_failed": "Please make sure you are online.",
+    "fr_head_checking": "Checking…",
+    "fr_sub_checking": "This takes a few seconds.",
+    "fr_card_places": "What we checked",
+    "fr_card_why": "Why?",
+    "fr_card_todo": "What to do",
+    "fr_card_words": "Mini glossary",
+    "fr_s_ok": "Connected over a regular line",
+    "fr_s_vpn": "Goes through a VPN",
+    "fr_s_outside": "Connected from a country where Claude isn't available",
+    "fr_s_unknown": "Couldn't check",
+    "fr_app_direct": "Connects directly, not through a VPN",
+    "fr_app_vpn": "Goes through a VPN",
+    "fr_app_mixed": "Partly through a VPN",
+    "fr_app_none": "No traffic found",
+    "fr_app_proxied": "Couldn't tell (may go through a relay)",
+    "fr_app_unknown": "Couldn't check",
+    "fr_baseline": "Other sites (for comparison)",
+    "fr_row_app": "Claude app / Claude Code (actual traffic)",
+    "fr_row_browser": "Browser to Claude (actual traffic)",
+    "fr_pending": "Checking…",
+})
+TEXT["ja"]["shortcuts"] = "F5：再チェック　Esc：閉じる　Ctrl＋プラス／マイナス：文字の大きさ　Ctrl＋0：元の大きさ　Ctrl＋L：言語　Ctrl＋M：表示の切り替え"
+TEXT["en"]["shortcuts"] = "F5: check again   Esc: close   Ctrl + plus/minus: text size   Ctrl+0: reset size   Ctrl+L: language   Ctrl+M: switch view"
+
+# 「やさしい表示」で、出てきた言葉だけを説明する（検索する言葉, 見出し, 説明）
+FR_GLOSSARY = {
+    "ja": [
+        ("アダプター", "アダプター", "パソコンがネットにつながる出入り口。VPN用の仮想のものと、有線やWi-Fiの本物があります。"),
+        ("IPv6", "IPv4・IPv6", "ネット上の住所の、2つの方式。"),
+        ("BAN", "BAN（バン）", "アカウントを止められて、使えなくされること。"),
+        ("VPN", "VPN（ブイピーエヌ）", "通信をいったん別の場所に通して、自分の場所をわかりにくくする仕組み。"),
+        ("データセンター", "データセンター", "たくさんのコンピューターを置いてある施設。VPNの多くは、ここから通信します。"),
+        ("ドメイン", "ドメイン", "ネット上の住所の名前。claude.aiのようなもの。"),
+        ("プロキシ", "プロキシ", "通信を代わりに中継するもの。VPNと同じように、自分の場所がわかりにくくなります。"),
+        ("中継", "中継", "通信をいったん受け取って、先へ送ること。広告ブロッカーなどがします。"),
+        ("除外", "除外（スプリットトンネリング）", "このサイトやアプリだけは、VPNを通さない、という設定。"),
+    ],
+    "en": [
+        ("adapter", "Adapter", "The doorway your PC uses to reach the internet. There are virtual ones for VPNs and real ones for wired LAN or Wi-Fi."),
+        ("ban", "BAN", "Your account is blocked and you can no longer use it."),
+        ("data center", "Data center", "A facility full of computers. Most VPNs send your traffic from one."),
+        ("domain", "Domain", "The name of a place on the internet, like claude.ai."),
+        ("exclu", "Exclusion (split tunneling)", "A setting that keeps chosen sites or apps out of the VPN."),
+        ("ipv6", "IPv4 / IPv6", "Two kinds of internet addresses."),
+        ("proxy", "Proxy", "Something that passes your traffic along for you. Like a VPN, it makes your location harder to tell."),
+        ("relay", "Relay", "Receiving traffic and passing it on, as an ad blocker does."),
+        ("vpn", "VPN", "A service that sends your traffic through another place so your location is harder to tell."),
+    ],
+}
+
 PALETTES = {
     "light": {
         "bg": "#f5f6f8", "fg": "#1d2330", "muted": "#5b6475", "line": "#d9dde5", "panel": "#ffffff",
@@ -1122,10 +1217,39 @@ PALETTES = {
         "disabled": "#5b6475",
     },
 }
+# 「やさしい表示」の配色：取説と同じ、ティールとピンクの2色＋白
+FR_PALETTES = {
+    "light": {
+        "bg": "#ffffff", "fg": "#22304a", "muted": "#5d6880", "line": "#d6dee8", "panel": "#eef3f8",
+        "band": "#e3f4f5", "teal": "#0e7c86", "pink": "#e0457b", "pink_soft": "#fde8f0",
+        SAFE: ("#1a7431", "#e6f4ea"), CAUTION: ("#9a5b00", "#fff4d6"), DANGER: ("#b4232d", "#fde4e1"),
+        "checking": ("#2f5bd3", "#e9eefc"), UNKNOWN: "#5d6880",
+        "primary": ("#0e7c86", "#0b6a73", "#085760", "#ffffff"),
+        "secondary": ("#e0457b", "#c93a6c", "#b02f5c", "#ffffff"),
+        "plain": ("#e3f4f5", "#cfe9eb", "#bcdde0", "#0e7c86"),
+        "band_btn": ("#ffffff", "#f3fbfc", "#e0f0f2", "#0e7c86"),
+        "disabled": "#9aa9b8", "disabled_bg": "#e6ebf1",
+    },
+    "dark": {
+        "bg": "#141922", "fg": "#e7ecf3", "muted": "#9ba7bb", "line": "#2c3544", "panel": "#1d2430",
+        "band": "#13313a", "teal": "#4fc3cc", "pink": "#ff7ba6", "pink_soft": "#3a1a28",
+        SAFE: ("#6fd39c", "#15301f"), CAUTION: ("#ffb35c", "#3a2f10"), DANGER: ("#ff8a80", "#3b1714"),
+        "checking": ("#9db5ff", "#1c2540"), UNKNOWN: "#9ba7bb",
+        "primary": ("#2a98a3", "#34a8b3", "#1f7f89", "#ffffff"),
+        "secondary": ("#c9457b", "#d9588c", "#b03a68", "#ffffff"),
+        "plain": ("#1c3d47", "#24505c", "#17323b", "#7fd8df"),
+        "band_btn": ("#1d2430", "#263040", "#18202c", "#7fd8df"),
+        "disabled": "#5b6475", "disabled_bg": "#262e3b",
+    },
+}
 FONT = "Yu Gothic UI"
+FR_FONT_CANDIDATES = ("M PLUS Rounded 1c", "Kosugi Maru", "Yu Gothic UI")
 FONT_SPECS = {"title": (16, "bold"), "body": (10, "normal"), "bold": (10, "bold"),
               "small": (9, "normal"), "banner": (14, "bold"), "heading": (11, "bold")}
+FR_FONT_SPECS = {"title": (20, "bold"), "body": (11, "normal"), "bold": (11, "bold"),
+                 "small": (10, "normal"), "banner": (18, "bold"), "heading": (13, "bold")}
 SCALE_MIN, SCALE_MAX, SCALE_STEP = 0.8, 1.6, 0.1
+FR_CARD_ORDER = ("result", "todo", "why", "places", "words")
 
 
 class HoverButton(tk.Button):
@@ -1143,6 +1267,187 @@ class HoverButton(tk.Button):
         self.bind("<ButtonRelease-1>", lambda e: self.config(relief="flat"))
 
 
+def _round_points(x1, y1, x2, y2, r):
+    return [x1 + r, y1, x2 - r, y1, x2, y1, x2, y1 + r, x2, y2 - r, x2, y2,
+            x2 - r, y2, x1 + r, y2, x1, y2, x1, y2 - r, x1, y1 + r, x1, y1]
+
+
+class PillButton(tk.Canvas):
+    """角の丸い（丸薬の形の）ボタン。ホバーで色が変わり、押すと少し沈む。HoverButton と同じ使い方ができる。"""
+
+    def __init__(self, master, colors, disabled_fg, font, text="", command=None,
+                 outer_bg=None, disabled_bg="#e6ebf1", padx=18, pady=8, **_ignored):
+        self._cols = colors
+        self._disabled_fg, self._disabled_bg = disabled_fg, disabled_bg
+        self._font, self._text, self._command = font, text, command
+        self._state, self._hover, self._pressed = "normal", False, False
+        self._padx, self._pady = padx, pady
+        super().__init__(master, bg=outer_bg or master.cget("bg"), highlightthickness=0, bd=0, cursor="hand2")
+        self.bind("<Enter>", self._enter)
+        self.bind("<Leave>", self._leave)
+        self.bind("<ButtonPress-1>", self._press)
+        self.bind("<ButtonRelease-1>", self._release)
+        self._layout()
+
+    def _layout(self):
+        self._pw = self._font.measure(self._text) + 2 * self._padx
+        self._ph = self._font.metrics("linespace") + 2 * self._pady
+        tk.Canvas.configure(self, width=self._pw, height=self._ph)
+        self._draw()
+
+    def _draw(self):
+        self.delete("all")
+        bg, hover, active, fg = self._cols
+        if self._state == "disabled":
+            fill, ink = self._disabled_bg, self._disabled_fg
+        else:
+            fill, ink = (active if self._pressed else hover if self._hover else bg), fg
+        r = self._ph / 2
+        self.create_polygon(_round_points(1, 1, self._pw - 1, self._ph - 1, r), smooth=True, fill=fill, outline=fill)
+        self.create_text(self._pw / 2, self._ph / 2 + (1 if self._pressed else 0), text=self._text,
+                         font=self._font, fill=ink)
+
+    def _enter(self, _e):
+        self._hover = True
+        self._draw()
+
+    def _leave(self, _e):
+        self._hover = self._pressed = False
+        self._draw()
+
+    def _press(self, _e):
+        if self._state != "disabled":
+            self._pressed = True
+            self._draw()
+
+    def _release(self, e):
+        was = self._pressed
+        self._pressed = False
+        self._draw()
+        if was and self._state != "disabled" and 0 <= e.x <= self._pw and 0 <= e.y <= self._ph and self._command:
+            self._command()
+
+    def configure(self, cnf=None, **kw):
+        if cnf:
+            kw.update(cnf)
+        changed = False
+        if "text" in kw:
+            self._text, changed = kw.pop("text"), True
+        if "state" in kw:
+            self._state = kw.pop("state")
+            self.configure_cursor()
+            changed = True
+        if "command" in kw:
+            self._command = kw.pop("command")
+        if kw:
+            tk.Canvas.configure(self, **kw)
+        if changed:
+            self._layout()
+
+    config = configure
+
+    def configure_cursor(self):
+        tk.Canvas.configure(self, cursor="arrow" if self._state == "disabled" else "hand2")
+
+    def __getitem__(self, key):
+        return self._state if key == "state" else super().__getitem__(key)
+
+
+class Card(tk.Canvas):
+    """角の丸いカード。中身は self.body（Frame）に置く。文字の折り返しは add_wrap で幅に合わせる。"""
+
+    def __init__(self, master, outer_bg, fill, border=None, radius=18, pad=16):
+        super().__init__(master, bg=outer_bg, highlightthickness=0, bd=0, height=20)
+        self.fill, self.border, self.radius, self.pad = fill, border, radius, pad
+        self.body = tk.Frame(self, bg=fill)
+        self._win = self.create_window(pad, pad, anchor="nw", window=self.body)
+        self._wraps = []
+        self.bind("<Configure>", self._on_canvas)
+        self.body.bind("<Configure>", self._on_body)
+
+    def add_wrap(self, label, indent=0):
+        self._wraps.append((label, indent))
+        w = self.winfo_width()
+        if w > 1:
+            label.configure(wraplength=max(80, w - 2 * self.pad - indent))
+
+    def recolor(self, fill, border=None):
+        self.fill, self.border = fill, border
+        self.body.configure(bg=fill)
+        self._draw()
+
+    def clear(self):
+        for child in self.body.winfo_children():
+            child.destroy()
+        self._wraps = []
+
+    def _on_canvas(self, e):
+        self.itemconfigure(self._win, width=max(10, e.width - 2 * self.pad))
+        for label, indent in self._wraps:
+            try:
+                label.configure(wraplength=max(80, e.width - 2 * self.pad - indent))
+            except tk.TclError:
+                pass
+        self._draw()
+
+    def _on_body(self, e):
+        h = e.height + 2 * self.pad
+        if int(float(self.cget("height"))) != h:
+            self.configure(height=h)
+        self._draw()
+
+    def _draw(self):
+        self.delete("bg")
+        w, h = self.winfo_width(), max(int(float(self.cget("height"))), 4)
+        if w < 8:
+            return
+        self.create_polygon(_round_points(1, 1, w - 1, h - 1, self.radius), smooth=True, fill=self.fill,
+                            outline=self.border or self.fill, width=2 if self.border else 1, tags="bg")
+        self.tag_lower("bg")
+
+
+class ScrollArea(tk.Frame):
+    """縦にスクロールできる領域。中身は self.inner に置く。"""
+
+    def __init__(self, master, bg):
+        super().__init__(master, bg=bg)
+        self.canvas = tk.Canvas(self, bg=bg, highlightthickness=0, bd=0)
+        self.bar = ttk.Scrollbar(self, orient="vertical", command=self.canvas.yview)
+        self.canvas.configure(yscrollcommand=self.bar.set)
+        self.bar.pack(side="right", fill="y")
+        self.canvas.pack(side="left", fill="both", expand=True)
+        self.inner = tk.Frame(self.canvas, bg=bg)
+        self._win = self.canvas.create_window(0, 0, anchor="nw", window=self.inner)
+        self.inner.bind("<Configure>", lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
+        self.canvas.bind("<Configure>", lambda e: self.canvas.itemconfigure(self._win, width=e.width))
+
+    def scroll(self, units):
+        self.canvas.yview_scroll(units, "units")
+
+
+def draw_icon(canvas, kind, size, color, on="#ffffff"):
+    """安全・要注意・危険・確認中のアイコンを描く（オリジナル）。"""
+    s = size
+    canvas.delete("all")
+    if kind == "caution":
+        canvas.create_polygon(s / 2, 5, s - 4, s - 7, 4, s - 7, smooth=True, fill=color, outline=color, width=6,
+                              joinstyle="round")
+        canvas.create_text(s / 2, s * 0.62, text="!", fill=on, font=("Yu Gothic UI", max(12, s // 3), "bold"))
+        return
+    canvas.create_oval(2, 2, s - 2, s - 2, fill=color, outline=color)
+    w = max(4, s // 10)
+    if kind == "safe":
+        canvas.create_line(s * .28, s * .52, s * .44, s * .68, s * .74, s * .34, fill=on, width=w,
+                           capstyle="round", joinstyle="round")
+    elif kind == "danger":
+        canvas.create_line(s * .33, s * .33, s * .67, s * .67, fill=on, width=w, capstyle="round")
+        canvas.create_line(s * .67, s * .33, s * .33, s * .67, fill=on, width=w, capstyle="round")
+    else:  # checking
+        for i in range(3):
+            cx = s * (0.3 + 0.2 * i)
+            canvas.create_oval(cx - w / 2, s / 2 - w / 2, cx + w / 2, s / 2 + w / 2, fill=on, outline=on)
+
+
 class App:
     def __init__(self, root, background=False):
         self.root = root
@@ -1151,20 +1456,26 @@ class App:
         self.checking = False
         self.attempts = 0
         self.update_info = None
+        self.domains_cache, self.rows_cache = [], {}
+        self.status_text, self.source_text = "", ""
         self.settings = load_json("settings.json", {})
         self.lang = self.settings.get("lang", "ja")
         if self.lang not in TEXT:
             self.lang = "ja"
+        self.view = "friendly" if self.settings.get("view") == "friendly" else "standard"
         try:
             self.scale = min(SCALE_MAX, max(SCALE_MIN, float(self.settings.get("font_scale", 1.0))))
         except (TypeError, ValueError):
             self.scale = 1.0
         self.mode = "dark" if windows_dark_mode() else "light"
-        self.c = PALETTES[self.mode]
-        c = self.c
+        self.var_auto = tk.BooleanVar(value=autostart_enabled())
+        self.var_update = tk.BooleanVar(value=bool(self.settings.get("update_check", False)))
+        families = set(tkfont.families(root))
+        self.round_family = next((f for f in FR_FONT_CANDIDATES if f in families), FONT)
         self.fonts = {n: tkfont.Font(family=FONT, size=s, weight=w) for n, (s, w) in FONT_SPECS.items()}
+        self.style = ttk.Style()
+        self.style.theme_use("clam")
 
-        root.configure(bg=c["bg"])
         height = min(980, max(700, root.winfo_screenheight() - 80))
         root.geometry(f"800x{height}")
         root.minsize(640, 700)
@@ -1172,32 +1483,108 @@ class App:
             root.withdraw()
         self._dark_title_bar()
 
-        outer = tk.Frame(root, bg=c["bg"], padx=20, pady=16)
+        root.bind("<F5>", lambda e: self.start_check())
+        root.bind("<Escape>", lambda e: root.destroy())
+        root.bind("<Control-l>", lambda e: self.toggle_lang())
+        root.bind("<Control-m>", lambda e: self.toggle_view())
+        for seq in ("<Control-plus>", "<Control-equal>", "<Control-KP_Add>"):
+            root.bind(seq, lambda e: self.change_scale(SCALE_STEP))
+        for seq in ("<Control-minus>", "<Control-KP_Subtract>"):
+            root.bind(seq, lambda e: self.change_scale(-SCALE_STEP))
+        root.bind("<Control-0>", lambda e: self.change_scale(None))
+
+        self.build_ui()
+        self.apply_scale()
+        self.apply_texts()
+        self.start_check()
+        if self.var_update.get() and not background:
+            threading.Thread(target=self._update_worker, daemon=True).start()
+
+    @property
+    def friendly(self):
+        return self.view == "friendly"
+
+    # --- 画面を組み立てる ---
+    def build_ui(self):
+        self.c = (FR_PALETTES if self.friendly else PALETTES)[self.mode]
+        self.root.configure(bg=self.c["bg"])
+        if self.friendly:
+            self._build_friendly()
+        else:
+            self._build_standard()
+
+    def _btn(self, parent, colors, key_command, **kw):
+        c = self.c
+        if self.friendly:
+            return PillButton(parent, colors, c["disabled"], self.fonts["bold"], command=key_command,
+                              outer_bg=parent.cget("bg"), disabled_bg=c["disabled_bg"], **kw)
+        return HoverButton(parent, colors, c["disabled"], self.fonts["bold"], command=key_command)
+
+    def _build_update_bar(self, parent):
+        c = self.c
+        self.update_bar = tk.Frame(parent, bg=c["bg"])
+        self.update_label = tk.Label(self.update_bar, font=self.fonts["bold"], bg=c["bg"],
+                                     fg=c["pink"] if self.friendly else c[CAUTION][0])
+        self.update_label.pack(side="left")
+        self.btn_update = self._btn(self.update_bar, c["plain"], self.open_update)
+        self.btn_update.pack(side="left", padx=10)
+
+    def _build_footer(self, parent):
+        c = self.c
+        self.notice = tk.Label(parent, font=self.fonts["small"], bg=c["bg"], fg=c["muted"], justify="left", anchor="w")
+        self.notice.pack(fill="x", pady=(8, 0))
+        self.shortcuts = tk.Label(parent, font=self.fonts["small"], bg=c["bg"], fg=c["muted"], justify="left", anchor="w")
+        self.shortcuts.pack(fill="x", pady=(2, 0))
+        parent.bind("<Configure>", lambda e: (self.notice.config(wraplength=max(300, e.width - 40)),
+                                              self.shortcuts.config(wraplength=max(300, e.width - 40))))
+        opts = tk.Frame(parent, bg=c["bg"])
+        opts.pack(fill="x", pady=(8, 0))
+        cb_kw = dict(bg=c["bg"], fg=c["fg"], activebackground=c["bg"], activeforeground=c["fg"],
+                     selectcolor=c["panel"], font=self.fonts["small"], anchor="w", cursor="hand2",
+                     highlightthickness=0, bd=0)
+        self.cb_auto = tk.Checkbutton(opts, variable=self.var_auto, command=self.on_autostart, **cb_kw)
+        self.cb_auto.pack(fill="x")
+        self.cb_update = tk.Checkbutton(opts, variable=self.var_update, command=self.on_update_check, **cb_kw)
+        self.cb_update.pack(fill="x")
+        bar = tk.Frame(parent, bg=c["bg"])
+        bar.pack(fill="x", pady=(10, 0))
+        self.btn_check = self._btn(bar, c["primary"], self.start_check)
+        self.btn_check.pack(side="left")
+        self.btn_copy = self._btn(bar, c["secondary"], self.copy_domains)
+        self.btn_copy.pack(side="left", padx=6)
+        self.btn_folder = self._btn(bar, c["plain"], self.open_folder)
+        self.btn_folder.pack(side="left")
+        self.btn_manual = self._btn(bar, c["plain"], self.open_manual)
+        self.btn_manual.pack(side="left", padx=6)
+        self.btn_close = self._btn(bar, c["plain"], self.root.destroy)
+        self.btn_close.pack(side="right")
+        self.status = tk.Label(parent, font=self.fonts["small"], bg=c["bg"], fg=c["muted"], anchor="w")
+        self.status.pack(fill="x", pady=(6, 0))
+
+    def _build_standard(self):
+        c = self.c
+        outer = tk.Frame(self.root, bg=c["bg"], padx=20, pady=16)
         outer.pack(fill="both", expand=True)
+        self.outer = outer
 
         top = tk.Frame(outer, bg=c["bg"])
         top.pack(fill="x")
         self.title = tk.Label(top, font=self.fonts["title"], bg=c["bg"], fg=c["fg"])
         self.title.pack(side="left")
-        self.btn_lang = HoverButton(top, c["plain"], c["disabled"], self.fonts["bold"], command=self.toggle_lang)
+        self.btn_lang = self._btn(top, c["plain"], self.toggle_lang)
         self.btn_lang.pack(side="right")
+        self.btn_view = self._btn(top, c["plain"], self.toggle_view)
+        self.btn_view.pack(side="right", padx=6)
         self.subtitle = tk.Label(outer, font=self.fonts["small"], bg=c["bg"], fg=c["muted"])
         self.subtitle.pack(anchor="w", pady=(0, 8))
 
-        self.update_bar = tk.Frame(outer, bg=c["bg"])
-        self.update_label = tk.Label(self.update_bar, font=self.fonts["bold"], bg=c["bg"], fg=c[CAUTION][0])
-        self.update_label.pack(side="left")
-        self.btn_update = HoverButton(self.update_bar, c["plain"], c["disabled"], self.fonts["bold"],
-                                      command=self.open_update)
-        self.btn_update.pack(side="left", padx=10)
+        self._build_update_bar(outer)
 
         self.banner = tk.Frame(outer, padx=14, pady=10, highlightthickness=1)
         self.banner.pack(fill="x")
         self.headline = tk.Label(self.banner, font=self.fonts["banner"], anchor="w", justify="left")
         self.headline.pack(fill="x")
 
-        self.style = ttk.Style()
-        self.style.theme_use("clam")
         self.tree = ttk.Treeview(outer, columns=("domain", "country", "status"), show="headings",
                                  height=len(DEFAULT_DOMAINS) + 1, style="K.Treeview", selectmode="none")
         for col, width in (("domain", 300), ("country", 90), ("status", 340)):
@@ -1224,56 +1611,84 @@ class App:
         scroll.pack(side="right", fill="y")
         self.text.pack(side="left", fill="both", expand=True)
 
-        self.notice = tk.Label(outer, font=self.fonts["small"], bg=c["bg"], fg=c["muted"],
-                               justify="left", anchor="w")
-        self.notice.pack(fill="x", pady=(8, 0))
-        self.shortcuts = tk.Label(outer, font=self.fonts["small"], bg=c["bg"], fg=c["muted"],
-                                  justify="left", anchor="w")
-        self.shortcuts.pack(fill="x", pady=(2, 0))
-        outer.bind("<Configure>", lambda e: (self.notice.config(wraplength=max(300, e.width - 40)),
-                                             self.shortcuts.config(wraplength=max(300, e.width - 40))))
+        self._build_footer(outer)
 
-        self.var_auto = tk.BooleanVar(value=autostart_enabled())
-        self.var_update = tk.BooleanVar(value=bool(self.settings.get("update_check", False)))
-        opts = tk.Frame(outer, bg=c["bg"])
-        opts.pack(fill="x", pady=(8, 0))
-        cb_kw = dict(bg=c["bg"], fg=c["fg"], activebackground=c["bg"], activeforeground=c["fg"],
-                     selectcolor=c["panel"], font=self.fonts["small"], anchor="w", cursor="hand2",
-                     highlightthickness=0, bd=0)
-        self.cb_auto = tk.Checkbutton(opts, variable=self.var_auto, command=self.on_autostart, **cb_kw)
-        self.cb_auto.pack(fill="x")
-        self.cb_update = tk.Checkbutton(opts, variable=self.var_update, command=self.on_update_check, **cb_kw)
-        self.cb_update.pack(fill="x")
+    def _build_friendly(self):
+        c = self.c
+        outer = tk.Frame(self.root, bg=c["bg"])
+        outer.pack(fill="both", expand=True)
+        self.outer = outer
 
-        bar = tk.Frame(outer, bg=c["bg"])
-        bar.pack(fill="x", pady=(10, 0))
-        self.btn_check = HoverButton(bar, c["primary"], c["disabled"], self.fonts["bold"], command=self.start_check)
-        self.btn_check.pack(side="left")
-        self.btn_copy = HoverButton(bar, c["secondary"], c["disabled"], self.fonts["bold"], command=self.copy_domains)
-        self.btn_copy.pack(side="left", padx=6)
-        self.btn_folder = HoverButton(bar, c["plain"], c["disabled"], self.fonts["bold"], command=self.open_folder)
-        self.btn_folder.pack(side="left")
-        self.btn_manual = HoverButton(bar, c["plain"], c["disabled"], self.fonts["bold"], command=self.open_manual)
-        self.btn_manual.pack(side="left", padx=6)
-        self.btn_close = HoverButton(bar, c["plain"], c["disabled"], self.fonts["bold"], command=root.destroy)
-        self.btn_close.pack(side="right")
-        self.status = tk.Label(outer, font=self.fonts["small"], bg=c["bg"], fg=c["muted"], anchor="w")
-        self.status.pack(fill="x", pady=(6, 0))
+        band = tk.Frame(outer, bg=c["band"], padx=24, pady=14)
+        band.pack(fill="x")
+        top = tk.Frame(band, bg=c["band"])
+        top.pack(fill="x")
+        self.title = tk.Label(top, font=self.fonts["title"], bg=c["band"], fg=c["teal"])
+        self.title.pack(side="left")
+        self.btn_lang = self._btn(top, c["band_btn"], self.toggle_lang)
+        self.btn_lang.pack(side="right")
+        self.btn_view = self._btn(top, c["band_btn"], self.toggle_view)
+        self.btn_view.pack(side="right", padx=6)
+        self.subtitle = tk.Label(band, font=self.fonts["small"], bg=c["band"], fg=c["muted"], justify="left", anchor="w")
+        self.subtitle.pack(fill="x", pady=(4, 0))
+        band.bind("<Configure>", lambda e: self.subtitle.config(wraplength=max(300, e.width - 60)))
 
-        root.bind("<F5>", lambda e: self.start_check())
-        root.bind("<Escape>", lambda e: root.destroy())
-        root.bind("<Control-l>", lambda e: self.toggle_lang())
-        for seq in ("<Control-plus>", "<Control-equal>", "<Control-KP_Add>"):
-            root.bind(seq, lambda e: self.change_scale(SCALE_STEP))
-        for seq in ("<Control-minus>", "<Control-KP_Subtract>"):
-            root.bind(seq, lambda e: self.change_scale(-SCALE_STEP))
-        root.bind("<Control-0>", lambda e: self.change_scale(None))
+        body = tk.Frame(outer, bg=c["bg"], padx=20, pady=0)
+        body.pack(fill="both", expand=True)
+        self._build_update_bar(body)
 
+        self.scroll = ScrollArea(body, c["bg"])
+        self.scroll.pack(fill="both", expand=True, pady=(12, 0))
+        inner = self.scroll.inner
+        self.cards = {key: Card(inner, c["bg"], c["panel"]) for key in FR_CARD_ORDER}
+        self.fr_visible = {key: key == "result" for key in FR_CARD_ORDER}
+        self._fr_layout()
+        self.root.bind_all("<MouseWheel>", self._on_wheel)
+
+        footer = tk.Frame(body, bg=c["bg"])
+        footer.pack(fill="x", pady=(0, 14))
+        self._build_footer(footer)
+
+    def _fr_layout(self):
+        for key in FR_CARD_ORDER:
+            self.cards[key].pack_forget()
+        for key in FR_CARD_ORDER:
+            if self.fr_visible[key]:
+                self.cards[key].pack(fill="x", pady=(0, 14), padx=(0, 6))
+
+    def _fr_set_visible(self, key, show):
+        if self.fr_visible.get(key) != show:
+            self.fr_visible[key] = show
+            self._fr_layout()
+
+    def _on_wheel(self, event):
+        if self.friendly and hasattr(self, "scroll"):
+            try:
+                self.scroll.scroll(int(-event.delta / 120) or (-1 if event.delta > 0 else 1))
+            except tk.TclError:
+                pass
+
+    def rebuild(self):
+        self.root.unbind_all("<MouseWheel>")
+        for w in self.root.winfo_children():
+            w.destroy()
+        self.build_ui()
         self.apply_scale()
         self.apply_texts()
-        self.start_check()
-        if self.var_update.get() and not background:
-            threading.Thread(target=self._update_worker, daemon=True).start()
+        self.btn_check.config(state="disabled" if self.checking else "normal")
+        self.set_status(self.status_text)
+        if self.result:
+            self.render(self.result)
+        elif self.checking:
+            self._replay_progress()
+        if self.update_info:
+            self._show_update(self.update_info)
+
+    def toggle_view(self):
+        self.view = "standard" if self.friendly else "friendly"
+        self.settings["view"] = self.view
+        save_json("settings.json", self.settings)
+        self.rebuild()
 
     # --- 見た目 ---
     def _dark_title_bar(self):
@@ -1288,16 +1703,24 @@ class App:
             pass
 
     def apply_scale(self):
-        for name, (size, _) in FONT_SPECS.items():
-            self.fonts[name].configure(size=max(7, round(size * self.scale)))
+        specs = FR_FONT_SPECS if self.friendly else FONT_SPECS
+        family = self.round_family if self.friendly else FONT
+        for name, (size, weight) in specs.items():
+            self.fonts[name].configure(family=family, size=max(7, round(size * self.scale)), weight=weight)
         c = self.c
         self.style.configure("K.Treeview", font=self.fonts["body"], rowheight=max(20, round(26 * self.scale)),
                              background=c["panel"], fieldbackground=c["panel"], foreground=c["fg"],
                              bordercolor=c["line"], lightcolor=c["line"], darkcolor=c["line"])
-        self.style.configure("K.Treeview.Heading", font=self.fonts["bold"], background=c["head_bg"],
-                             foreground=c["fg"], bordercolor=c["line"], lightcolor=c["head_bg"],
-                             darkcolor=c["head_bg"], relief="flat")
-        self.style.map("K.Treeview.Heading", background=[("active", c["head_bg"])])
+        self.style.configure("K.Treeview.Heading", font=self.fonts["bold"], background=c.get("head_bg", c["panel"]),
+                             foreground=c["fg"], bordercolor=c["line"], lightcolor=c.get("head_bg", c["panel"]),
+                             darkcolor=c.get("head_bg", c["panel"]), relief="flat")
+        self.style.map("K.Treeview.Heading", background=[("active", c.get("head_bg", c["panel"]))])
+        if self.friendly:  # ボタンの大きさを文字に合わせ直す
+            for btn in (self.btn_check, self.btn_copy, self.btn_folder, self.btn_manual, self.btn_close,
+                        self.btn_lang, self.btn_view, self.btn_update):
+                btn._layout()
+            if self.result:
+                self.render(self.result)
 
     def change_scale(self, step):
         self.scale = 1.0 if step is None else min(SCALE_MAX, max(SCALE_MIN, round(self.scale + step, 2)))
@@ -1311,14 +1734,19 @@ class App:
     def apply_texts(self):
         self.root.title(f"{self.t('app')} {VERSION}")
         self.title.config(text=self.t("title"))
-        self.subtitle.config(text=self.t("subtitle"))
-        self.notice.config(text=self.t("notice"))
+        if self.friendly:
+            self.subtitle.config(text=self.t("fr_tagline"))
+            self.notice.config(text=self.t("subtitle") + "\n" + self.t("notice"))
+        else:
+            self.subtitle.config(text=self.t("subtitle"))
+            self.notice.config(text=self.t("notice"))
+            self.text.config(wrap="char" if self.lang == "ja" else "word")  # 英語は単語の途中で折り返さない
+            for col in ("domain", "country", "status"):
+                self.tree.heading(col, text=self.t("col_" + col), anchor="w")
         self.shortcuts.config(text=self.t("shortcuts"))
-        self.text.config(wrap="char" if self.lang == "ja" else "word")  # 英語は単語の途中で折り返さない
         self.cb_auto.config(text=self.t("opt_autostart"))
         self.cb_update.config(text=self.t("opt_update"))
-        for col in ("domain", "country", "status"):
-            self.tree.heading(col, text=self.t("col_" + col), anchor="w")
+        self.btn_view.config(text=self.t("btn_view_standard" if self.friendly else "btn_view_friendly"))
         for btn, key in ((self.btn_check, "btn_check"), (self.btn_copy, "btn_copy"),
                          (self.btn_folder, "btn_folder"), (self.btn_manual, "btn_manual"),
                          (self.btn_lang, "btn_lang"), (self.btn_close, "btn_close"),
@@ -1335,9 +1763,20 @@ class App:
         if self.result:
             self.render(self.result)
         elif self.checking:
-            self.set_banner("checking", self.t("checking"))
+            self._replay_progress()
+
+    def set_status(self, text):
+        self.status_text = text
+        self.status.config(text=text)
+
+    def set_source(self, text):
+        self.source_text = text
+        if not self.friendly:
+            self.source.config(text=text)
 
     def set_banner(self, key, text):
+        if self.friendly:
+            return
         fg, bg = self.c[key]
         self.banner.config(bg=bg, highlightbackground=fg, highlightcolor=fg)
         self.headline.config(text=text, bg=bg, fg=fg)
@@ -1349,10 +1788,10 @@ class App:
             set_autostart(want)
         except OSError:
             self.var_auto.set(not want)
-            self.status.config(text=self.t("autostart_failed"))
+            self.set_status(self.t("autostart_failed"))
             return
         if want and not getattr(sys, "frozen", False):
-            self.status.config(text=self.t("autostart_unavailable"))
+            self.set_status(self.t("autostart_unavailable"))
 
     def on_update_check(self):
         self.settings["update_check"] = bool(self.var_update.get())
@@ -1375,7 +1814,10 @@ class App:
             return
         self.update_info = info
         self.update_label.config(text=self.t("update_available").format(v=info[0]))
-        self.update_bar.pack(fill="x", pady=(0, 8), before=self.banner)
+        if self.friendly:
+            self.update_bar.pack(fill="x", pady=(10, 0), before=self.scroll)
+        else:
+            self.update_bar.pack(fill="x", pady=(0, 8), before=self.banner)
 
     def open_update(self):
         if self.update_info:
@@ -1387,15 +1829,19 @@ class App:
             return
         self.checking = True
         self.result = None
+        self.rows_cache = {}
         self.btn_check.config(state="disabled")
         self.btn_copy.config(state="disabled")
-        self.set_banner("checking", self.t("checking"))
-        self.status.config(text="")
-        self.source.config(text="")
-        self.tree.delete(*self.tree.get_children())
-        self.text.config(state="normal")
-        self.text.delete("1.0", "end")
-        self.text.config(state="disabled")
+        self.set_status("")
+        self.set_source("")
+        if self.friendly:
+            self._fr_show_checking()
+        else:
+            self.set_banner("checking", self.t("checking"))
+            self.tree.delete(*self.tree.get_children())
+            self.text.config(state="normal")
+            self.text.delete("1.0", "end")
+            self.text.config(state="disabled")
         threading.Thread(target=self._worker, daemon=True).start()
 
     def _worker(self):
@@ -1409,7 +1855,27 @@ class App:
             result, err = None, e
         self.root.after(0, self.show_result, result, err)
 
+    def _replay_progress(self):
+        if self.friendly:
+            self._fr_show_checking()
+        else:
+            self.set_banner("checking", self.t("checking"))
+        if self.domains_cache:
+            self._placeholder_rows(self.domains_cache)
+            for row in list(self.rows_cache.values()):
+                self._progress_row(row)
+
     def _placeholder_rows(self, domains):
+        self.domains_cache = list(domains)
+        if self.friendly:
+            self.fr_row_widgets = {}
+            body = self._fr_card_begin("places", self.t("fr_card_places"))
+            for d in domains + [BASELINE_DOMAIN, "__app__", "__browser__"]:
+                name = (self.t("fr_baseline") if d == BASELINE_DOMAIN else
+                        self.t("fr_row_app") if d == "__app__" else
+                        self.t("fr_row_browser") if d == "__browser__" else d)
+                self._fr_row(body, d, name, self.t("fr_pending"), "pending", "")
+            return
         self.tree.delete(*self.tree.get_children())
         self.tree.configure(height=len(domains) + 3)
         for d in domains + [BASELINE_DOMAIN, "__app__", "__browser__"]:
@@ -1420,7 +1886,13 @@ class App:
                              tags=("base" if d == BASELINE_DOMAIN else "pending",))
 
     def _progress_row(self, row):
+        self.rows_cache[row["domain"]] = row
         iid = row["domain"]
+        if self.friendly:
+            if iid in getattr(self, "fr_row_widgets", {}):
+                self._fr_row_update(iid, self._fr_status(row), "base" if iid == BASELINE_DOMAIN else row["status"],
+                                    self._fr_country(row))
+            return
         if not self.tree.exists(iid):
             return
         country, status = row_values(row, self.lang)
@@ -1432,8 +1904,11 @@ class App:
         self.checking = False
         self.btn_check.config(state="normal")
         if err is not None:
-            self.set_banner(CAUTION, self.t("check_failed"))
-            self.status.config(text=self.t("error").format(e=type(err).__name__))
+            if self.friendly:
+                self._fr_show_result_card("caution", self.t("fr_head_failed"), self.t("fr_sub_failed"))
+            else:
+                self.set_banner(CAUTION, self.t("check_failed"))
+            self.set_status(self.t("error").format(e=type(err).__name__))
             self._after_background(None)
             return
         result["prev"] = load_last()
@@ -1441,7 +1916,7 @@ class App:
         self.render(result)
         note = save_history(result, self.lang)
         save_last(result)
-        self.status.config(text=note or self.t("saved").format(t=f"{result['time']:%Y-%m-%d %H:%M}"))
+        self.set_status(note or self.t("saved").format(t=f"{result['time']:%Y-%m-%d %H:%M}"))
         self._after_background(result)
 
     def _after_background(self, result):
@@ -1460,10 +1935,17 @@ class App:
         self.root.lift()
         self.background = False
 
+    # --- 「ふつうの表示」の描画 ---
     def render(self, result):
         headline, reasons, actions = build_explanation(result, self.lang)
-        self.set_banner(CAUTION if result["all_failed"] else result["level"], headline)
-
+        level = CAUTION if result["all_failed"] else result["level"]
+        has_vpn = any(r["status"] == VPN for r in result["rows"])
+        self.btn_copy.config(state="normal" if has_vpn else "disabled")
+        self.set_source(self.t("src_" + result["country_src"]).format(d=result["country_date"]))
+        if self.friendly:
+            self._fr_render(result, headline, reasons, actions, level)
+            return
+        self.set_banner(level, headline)
         self.tree.delete(*self.tree.get_children())
         self.tree.configure(height=len(result["rows"]) + 3)
         for r in result["rows"]:
@@ -1481,8 +1963,6 @@ class App:
                 state = "app_" + st
                 tag = {"direct": OK, "vpn": VPN, "mixed": VPN}.get(st, "base")  # none / proxied は薄い色
             self.tree.insert("", "end", iid="__" + key + "__", values=(self.t("row_" + key), "—", self.t(state)), tags=(tag,))
-        self.source.config(text=self.t("src_" + result["country_src"]).format(d=result["country_date"]))
-
         self.text.config(state="normal")
         self.text.delete("1.0", "end")
         self.text.insert("end", self.t("reasons") + "\n", "h")
@@ -1493,8 +1973,150 @@ class App:
             self.text.insert("end", f"{i}. {s}\n", "p")
         self.text.config(state="disabled")
 
-        has_vpn = any(r["status"] == VPN for r in result["rows"])
-        self.btn_copy.config(state="normal" if has_vpn else "disabled")
+    # --- 「やさしい表示」の描画 ---
+    @staticmethod
+    def _nb(text):
+        return text.replace("Claude Code", "Claude Code")
+
+    def _fr_status(self, row):
+        t = self.t
+        text = t("fr_s_" + row["status"])
+        if row.get("note"):
+            text += f"\n{t('note_' + row['note'])}"
+        return text
+
+    def _fr_country(self, row):
+        return " / ".join(country_label(c, self.lang) for c in row["countries"])
+
+    def _fr_color(self, tag):
+        c = self.c
+        return {OK: c[SAFE][0], VPN: c[CAUTION][0], OUTSIDE: c[DANGER][0]}.get(tag, c["muted"])
+
+    def _fr_card_begin(self, key, title, fill=None, border=None):
+        card = self.cards[key]
+        self._fr_set_visible(key, True)
+        card.recolor(fill or self.c["panel"], border)
+        card.clear()
+        fill = card.fill
+        if title:
+            tk.Label(card.body, text=title, font=self.fonts["heading"], bg=fill, fg=self.c["teal"],
+                     anchor="w").pack(fill="x", pady=(0, 8))
+        return card.body
+
+    def _fr_row(self, body, iid, name, status, tag, country):
+        fill = body.cget("bg")
+        row = tk.Frame(body, bg=fill)
+        row.pack(fill="x", pady=3)
+        row.columnconfigure(1, minsize=250)
+        row.columnconfigure(2, weight=1)
+        dot = tk.Canvas(row, width=16, height=16, bg=fill, highlightthickness=0)
+        oval = dot.create_oval(2, 2, 14, 14, fill=self._fr_color(tag), outline=self._fr_color(tag))
+        dot.grid(row=0, column=0, sticky="n", padx=(0, 10), pady=4)
+        tk.Label(row, text=self._nb(name), font=self.fonts["bold"], bg=fill, fg=self.c["fg"], anchor="w", justify="left",
+                 wraplength=240).grid(row=0, column=1, sticky="nw")
+        status_label = tk.Label(row, text=status, font=self.fonts["body"], bg=fill, fg=self._fr_color(tag),
+                                anchor="w", justify="left")
+        status_label.grid(row=0, column=2, sticky="nw", padx=(8, 8))
+        country_widget = tk.Label(row, text=country, font=self.fonts["small"], bg=fill, fg=self.c["muted"])
+        country_widget.grid(row=0, column=3, sticky="ne")
+        self.cards["places"].add_wrap(status_label, indent=16 + 10 + 250 + 16 + 110)
+        self.fr_row_widgets[iid] = (dot, oval, status_label, country_widget)
+
+    def _fr_row_update(self, iid, status, tag, country):
+        dot, oval, status_label, country_widget = self.fr_row_widgets[iid]
+        color = self._fr_color(tag)
+        dot.itemconfigure(oval, fill=color, outline=color)
+        status_label.config(text=status, fg=color)
+        country_widget.config(text=country)
+
+    def _fr_show_result_card(self, level, head, sub):
+        key = {SAFE: SAFE, "safe": SAFE, CAUTION: CAUTION, "caution": CAUTION, DANGER: DANGER, "danger": DANGER}.get(level, "checking")
+        fg, bg = self.c[key]
+        body = self._fr_card_begin("result", None, fill=bg)
+        row = tk.Frame(body, bg=bg)
+        row.pack(fill="x")
+        icon = tk.Canvas(row, width=64, height=64, bg=bg, highlightthickness=0)
+        draw_icon(icon, {SAFE: "safe", CAUTION: "caution", DANGER: "danger"}.get(key, "checking"), 64, fg)
+        icon.pack(side="left", padx=(0, 16))
+        text = tk.Frame(row, bg=bg)
+        text.pack(side="left", fill="x", expand=True)
+        tk.Label(text, text=head, font=self.fonts["banner"], bg=bg, fg=fg, anchor="w", justify="left").pack(fill="x")
+        sub_label = tk.Label(text, text=sub, font=self.fonts["body"], bg=bg, fg=self.c["fg"], anchor="w", justify="left")
+        sub_label.pack(fill="x", pady=(4, 0))
+        self.cards["result"].add_wrap(sub_label, indent=84)
+
+    def _fr_show_checking(self):
+        self._fr_show_result_card("checking", self.t("fr_head_checking"), self.t("fr_sub_checking"))
+        for key in ("places", "why", "todo", "words"):
+            self.cards[key].clear()
+            self.fr_visible[key] = False
+        self._fr_layout()
+
+    def _fr_render(self, result, headline, reasons, actions, level):
+        t, c = self.t, self.c
+        failed = result["all_failed"]
+        name = "failed" if failed else level
+        self._fr_show_result_card(level, t("fr_head_" + name), t("fr_sub_" + name))
+
+        # しらべた場所
+        self.fr_row_widgets = {}
+        body = self._fr_card_begin("places", t("fr_card_places"))
+        shown = []
+        for r in result["rows"]:
+            self._fr_row(body, r["domain"], r["domain"], self._fr_status(r), r["status"], self._fr_country(r))
+            shown.append(self._fr_status(r))
+        b = result["baseline"]
+        self._fr_row(body, BASELINE_DOMAIN, t("fr_baseline"), self._fr_status(b), "base", self._fr_country(b))
+        apps = result.get("apps")
+        for key in ("app", "browser"):
+            st = "unknown" if apps is None else apps[key]["status"]
+            tag = {"direct": OK, "vpn": VPN, "mixed": VPN}.get(st, "base")
+            text = t("fr_app_" + st)
+            self._fr_row(body, "__" + key + "__", t("fr_row_" + key), text, tag, "")
+            shown.append(text)
+        src = tk.Label(body, text=self.source_text, font=self.fonts["small"], bg=body.cget("bg"), fg=c["muted"],
+                       anchor="w", justify="left")
+        src.pack(fill="x", pady=(8, 0))
+        self.cards["places"].add_wrap(src)
+
+        # どうして？
+        body = self._fr_card_begin("why", t("fr_card_why"))
+        for s in reasons:
+            row = tk.Frame(body, bg=body.cget("bg"))
+            row.pack(fill="x", pady=3)
+            tk.Label(row, text="•", font=self.fonts["bold"], bg=body.cget("bg"), fg=c["teal"]).pack(side="left", anchor="n", padx=(0, 8))
+            lb = tk.Label(row, text=self._nb(s), font=self.fonts["body"], bg=body.cget("bg"), fg=c["fg"], anchor="w", justify="left")
+            lb.pack(side="left", fill="x", expand=True)
+            self.cards["why"].add_wrap(lb, indent=28)
+
+        # やること
+        body = self._fr_card_begin("todo", t("fr_card_todo"))
+        for i, s in enumerate(actions, 1):
+            fill = body.cget("bg")
+            row = tk.Frame(body, bg=fill)
+            row.pack(fill="x", pady=5)
+            num = tk.Canvas(row, width=30, height=30, bg=fill, highlightthickness=0)
+            num.create_oval(1, 1, 29, 29, fill=c["teal"], outline=c["teal"])
+            num.create_text(15, 15, text=str(i), fill="#ffffff", font=self.fonts["bold"])
+            num.pack(side="left", anchor="n", padx=(0, 12))
+            lb = tk.Label(row, text=self._nb(s), font=self.fonts["body"], bg=fill, fg=c["fg"], anchor="w", justify="left")
+            lb.pack(side="left", fill="x", expand=True)
+            self.cards["todo"].add_wrap(lb, indent=48)
+
+        # ことばの説明（出てきた言葉だけ）
+        haystack = " ".join([headline, t("fr_sub_" + name)] + reasons + actions + shown).lower()
+        entries = [(h, d) for key, h, d in FR_GLOSSARY[self.lang] if key.lower() in haystack]
+        if entries:
+            body = self._fr_card_begin("words", t("fr_card_words"))
+            for head, desc in entries:
+                fill = body.cget("bg")
+                tk.Label(body, text=head, font=self.fonts["bold"], bg=fill, fg=c["fg"], anchor="w").pack(fill="x", pady=(6, 0))
+                lb = tk.Label(body, text=desc, font=self.fonts["body"], bg=fill, fg=c["muted"], anchor="w", justify="left")
+                lb.pack(fill="x")
+                self.cards["words"].add_wrap(lb)
+        else:
+            self.cards["words"].clear()
+            self._fr_set_visible("words", False)
 
     def copy_domains(self):
         if not self.result:
@@ -1504,7 +2126,7 @@ class App:
             return
         self.root.clipboard_clear()
         self.root.clipboard_append("\n".join(domains))
-        self.status.config(text=self.t("copied").format(n=len(domains), d=self.t("sep").join(domains)))
+        self.set_status(self.t("copied").format(n=len(domains), d=self.t("sep").join(domains)))
 
     def open_folder(self):
         os.startfile(data_dir())
@@ -1516,7 +2138,7 @@ class App:
             if os.path.exists(path):
                 os.startfile(path)
                 return
-        self.status.config(text=self.t("no_manual"))
+        self.set_status(self.t("no_manual"))
 
 
 def main():

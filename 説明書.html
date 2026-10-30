@@ -71,7 +71,7 @@ th { color: var(--muted); font-weight: 700; white-space: nowrap; }
     <p class="meta" style="margin:0 0 8px"><a href="Manual_en.html">English</a> · 日本語</p>
     <h1>回線チェッカー 説明書</h1>
     <p class="lead">このパソコンのネットのつながり方が、<br>Anthropicから見てBANされやすい状態かどうかを判定するWindows 11用のアプリです。</p>
-    <p class="meta">バージョン 1.3.0 ／ 2026-10-29</p>
+    <p class="meta">バージョン 1.4.0 ／ 2026-10-30</p>
   </header>
 
   <div class="note warn">
@@ -142,6 +142,10 @@ th { color: var(--muted); font-weight: 700; white-space: nowrap; }
 
   <section id="features">
     <h2>便利な機能</h2>
+    <h3><wbr>「⁠や⁠さ⁠し⁠い⁠表⁠示⁠」に切り替える</h3>
+    <p>画面の右上の<wbr>「⁠や⁠さ⁠し⁠い⁠表⁠示⁠」を押す（または<code>Ctrl</code> + <code>M</code>）と、<br>取説のような、<br>やさしい見た目に切り替わります。<br>もう一度押すと、<br>ふつうの表示に戻ります。<br>選んだ表示は、<br>次に開いたときも使われます。</p>
+    <p>やさしい表示では、<br>結果がアイコン付きの大きなカードで出ます。<br><wbr>「⁠や⁠る⁠こ⁠と⁠」がいちばん上に出て、<br><wbr>「⁠ど⁠う⁠し⁠て⁠？⁠」<wbr>「⁠し⁠ら⁠べ⁠た⁠場⁠所⁠」が続きます。<br>VPN、<br>プロキシ、<br>BANなどのむずかしい言葉は、<br>いちばん下の<wbr>「⁠こ⁠と⁠ば⁠の⁠説⁠明⁠」で、<br>出てきた言葉だけを説明します。<br>判定の中身は、<br>ふつうの表示と同じです。</p>
+    <figure style="margin:0 0 12px"><img src="画面_やさしい.png" alt="やさしい表示の画面。緑色のカードに「だいじょうぶ！　安心して使えます」と出て、やること、どうして？のカードが続いている。" style="width:100%;max-width:560px;height:auto;border:1px solid var(--line);border-radius:6px;display:block"><figcaption style="font-size:0.8rem;color:var(--muted);margin-top:6px">やさしい表示の画面</figcaption></figure>
     <h3>キーボードで操作する</h3>
     <div class="table-wrap">
       <table>
@@ -152,6 +156,7 @@ th { color: var(--muted); font-weight: 700; white-space: nowrap; }
           <tr><td><code>Ctrl</code> + <code>＋</code> / <code>Ctrl</code> + <code>－</code></td><td>文字を大きく／小さくする（0.8倍〜1.6倍）</td></tr>
           <tr><td><code>Ctrl</code> + <code>0</code></td><td>文字の大きさを元に戻す</td></tr>
           <tr><td><code>Ctrl</code> + <code>L</code></td><td>日本語と英語を切り替える</td></tr>
+          <tr><td><code>Ctrl</code> + <code>M</code></td><td>ふつうの表示と、<br>やさしい表示を切り替える</td></tr>
         </tbody>
       </table>
     </div>
@@ -269,7 +274,7 @@ th { color: var(--muted); font-weight: 700; white-space: nowrap; }
     </ol>
     <h3>ファイルが本物か確かめる</h3>
     <p>配布ページに載っているSHA-256の値と、<br>ダウンロードしたzipファイルの値が同じなら、<br>途中で書き換えられていません。<br>PowerShellで次のように確かめられます。</p>
-    <pre>Get-FileHash .\KaisenChecker_v1.3.0.zip -Algorithm SHA256</pre>
+    <pre>Get-FileHash .\KaisenChecker_v1.4.0.zip -Algorithm SHA256</pre>
   </section>
 
   <section id="how">
@@ -333,6 +338,7 @@ th { color: var(--muted); font-weight: 700; white-space: nowrap; }
           <tr><td><span class="file">回線チェッカー取説.exe</span></td><td>やさしい取説（日本語・⁠英語。<br>ダブルクリックでブラウザに開きます）</td></tr>
           <tr><td><span class="file">Manual_en.html</span></td><td>英語版の説明書</td></tr>
           <tr><td><span class="file">screen_en.png</span></td><td>英語版の説明書で使う画面の画像</td></tr>
+          <tr><td><span class="file">画面_やさしい.png</span> / <span class="file">screen_friendly_en.png</span></td><td>やさしい表示の画面の画像</td></tr>
           <tr><td><span class="file">LICENSE</span></td><td>ライセンス（MIT License）</td></tr>
         </tbody>
       </table>

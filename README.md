@@ -37,7 +37,7 @@ See `Manual_en.html` (English) or `説明書.html` (Japanese) for details. Use t
 ## ファイルの確認 / Verify the download
 
 ```powershell
-Get-FileHash .\KaisenChecker_v1.3.0.zip -Algorithm SHA256
+Get-FileHash .\KaisenChecker_v1.4.0.zip -Algorithm SHA256
 ```
 
 結果を、配布ページの `SHA256SUMS.txt` と比べてください。 / Compare the result with `SHA256SUMS.txt` on the release page.
@@ -61,6 +61,7 @@ MIT License — Copyright (c) 2026 Cape-PC。くわしくは `LICENSE` を見て
 
 ## 変更履歴 / Changelog
 
+- 1.4.0：「やさしい表示」を追加（取説のような見た目。右上のボタンか Ctrl＋M で切り替え）。 / Added a "friendly view" with the look of the beginner's guide (switch with the top-right button or Ctrl+M).
 - 1.3.0：Claudeアプリ・Claude Code・ブラウザの実際の通信を調べて、アプリ単位でVPNから外している場合の判定のずれを減らした。文字欄にスクロールバーを追加。 / Looks at the actual connections of the Claude app, Claude Code and browsers to reduce wrong results when apps are excluded from the VPN. Added a scrollbar to the text area.
 - 1.2.0：IPv4とIPv6の両方を確認／2つの判定サービスの答えを比較／通常の方法が使えないときの代替／ドメイン一覧の許可リスト／ドメインごとの結果を順に表示／前回との比較／Windows起動時の自動チェック（任意）／キーボード操作と文字の大きさ／新しい版の確認（任意）。 / Checks IPv4 and IPv6, compares two lookup services, falls back when the normal method fails, allow-lists remote domains, shows results as they arrive, compares with the last result, optional startup check, keyboard shortcuts and text size, optional update check.
 - 1.1.2：やさしい取説の英語版（`Beginners_Guide_en.html`）を追加。取説exeは、アプリの言語に合わせて日本語版か英語版を開く。 / Added the English beginner's guide; the guide exe opens the one that matches the app's language.
