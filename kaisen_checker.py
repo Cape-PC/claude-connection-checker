@@ -1101,8 +1101,10 @@ def save_history(result, lang):
 # ---------------------------------------------------------------- 画面
 
 TEXT["ja"].update({
-    "btn_view_friendly": "やさしい表示",
-    "btn_view_standard": "ふつうの表示",
+    "view_label": "表示：{name}",
+    "view_hud": "ダーク",
+    "view_friendly": "やさしい",
+    "view_plain": "ふつう",
     "fr_tagline": "Claudeにつなぐネットが、BANされにくい状態かを、やさしくチェックします。",
     "fr_head_safe": "だいじょうぶ！　安心して使えます",
     "fr_sub_safe": "BANされやすい接続ではありません。",
@@ -1134,8 +1136,10 @@ TEXT["ja"].update({
     "fr_pending": "しらべています…",
 })
 TEXT["en"].update({
-    "btn_view_friendly": "Friendly view",
-    "btn_view_standard": "Standard view",
+    "view_label": "View: {name}",
+    "view_hud": "Dark",
+    "view_friendly": "Friendly",
+    "view_plain": "Plain",
     "fr_tagline": "A gentle check of whether your connection to Claude is safe from bans.",
     "fr_head_safe": "You're all set!",
     "fr_sub_safe": "This connection is unlikely to get you banned.",
@@ -1217,6 +1221,17 @@ PALETTES = {
         "disabled": "#5b6475",
     },
 }
+# 初期の表示（ダーク／HUD風）の配色：暗い背景に、ネオンの緑とシアン
+HUD_PALETTE = {
+    "bg": "#050b11", "fg": "#d7eaf5", "muted": "#7f98a8", "line": "#1d4a5e", "panel": "#07131c",
+    "head_bg": "#0d2230", "accent": "#7fd8ff", "check_bg": "#cfe8f5",
+    SAFE: ("#5df5a8", "#0a2a20"), CAUTION: ("#ffc15a", "#2e2208"), DANGER: ("#ff6b6b", "#2e0d10"),
+    "checking": ("#6cc6ff", "#0a2236"), UNKNOWN: "#7f98a8", "link": "#7fd8ff",
+    "primary": ("#0d2230", "#12384f", "#0a1a26", "#7fd8ff"),
+    "secondary": ("#0d2230", "#12384f", "#0a1a26", "#7fd8ff"),
+    "plain": ("#0a1822", "#12384f", "#07121a", "#9fdcf5"),
+    "disabled": "#3d5666",
+}
 # 「やさしい表示」の配色：取説と同じ、ティールとピンクの2色＋白
 FR_PALETTES = {
     "light": {
@@ -1255,8 +1270,10 @@ FR_CARD_ORDER = ("result", "todo", "why", "places", "words")
 class HoverButton(tk.Button):
     """ホバーで色が変わり、押すと沈むボタン。"""
 
-    def __init__(self, master, colors, disabled_fg, font, **kw):
+    def __init__(self, master, colors, disabled_fg, font, border=None, **kw):
         bg, hover, active, fg = colors
+        if border:
+            kw.update(highlightthickness=1, highlightbackground=border, highlightcolor=border)
         super().__init__(master, bg=bg, fg=fg, activebackground=active, activeforeground=fg,
                          relief="flat", bd=0, cursor="hand2", padx=14, pady=7,
                          font=font, disabledforeground=disabled_fg, **kw)
@@ -1462,7 +1479,8 @@ class App:
         self.lang = self.settings.get("lang", "ja")
         if self.lang not in TEXT:
             self.lang = "ja"
-        self.view = "friendly" if self.settings.get("view") == "friendly" else "standard"
+        self.view = {"friendly": "friendly", "plain": "plain", "standard": "plain", "hud": "hud"}.get(
+            self.settings.get("view"), "hud")
         try:
             self.scale = min(SCALE_MAX, max(SCALE_MIN, float(self.settings.get("font_scale", 1.0))))
         except (TypeError, ValueError):
@@ -1481,7 +1499,7 @@ class App:
         root.minsize(640, 700)
         if background:
             root.withdraw()
-        self._dark_title_bar()
+        self._set_title_bar(self.view == "hud" or self.mode == "dark")
 
         root.bind("<F5>", lambda e: self.start_check())
         root.bind("<Escape>", lambda e: root.destroy())
@@ -1504,9 +1522,13 @@ class App:
     def friendly(self):
         return self.view == "friendly"
 
+    @property
+    def hud(self):
+        return self.view == "hud"
+
     # --- 画面を組み立てる ---
     def build_ui(self):
-        self.c = (FR_PALETTES if self.friendly else PALETTES)[self.mode]
+        self.c = HUD_PALETTE if self.hud else (FR_PALETTES if self.friendly else PALETTES)[self.mode]
         self.root.configure(bg=self.c["bg"])
         if self.friendly:
             self._build_friendly()
@@ -1518,7 +1540,10 @@ class App:
         if self.friendly:
             return PillButton(parent, colors, c["disabled"], self.fonts["bold"], command=key_command,
                               outer_bg=parent.cget("bg"), disabled_bg=c["disabled_bg"], **kw)
-        return HoverButton(parent, colors, c["disabled"], self.fonts["bold"], command=key_command)
+        border = None
+        if self.hud:
+            border = c["line"] if colors is c["plain"] else c["accent"]
+        return HoverButton(parent, colors, c["disabled"], self.fonts["bold"], border=border, command=key_command)
 
     def _build_update_bar(self, parent):
         c = self.c
@@ -1540,7 +1565,7 @@ class App:
         opts = tk.Frame(parent, bg=c["bg"])
         opts.pack(fill="x", pady=(8, 0))
         cb_kw = dict(bg=c["bg"], fg=c["fg"], activebackground=c["bg"], activeforeground=c["fg"],
-                     selectcolor=c["panel"], font=self.fonts["small"], anchor="w", cursor="hand2",
+                     selectcolor=c.get("check_bg", c["panel"]), font=self.fonts["small"], anchor="w", cursor="hand2",
                      highlightthickness=0, bd=0)
         self.cb_auto = tk.Checkbutton(opts, variable=self.var_auto, command=self.on_autostart, **cb_kw)
         self.cb_auto.pack(fill="x")
@@ -1580,10 +1605,14 @@ class App:
 
         self._build_update_bar(outer)
 
-        self.banner = tk.Frame(outer, padx=14, pady=10, highlightthickness=1)
+        self.banner = tk.Frame(outer, highlightthickness=1)
         self.banner.pack(fill="x")
+        self.banner_bar = None
+        if self.hud:  # 左に太い線（place は Frame の padx/pady を足してしまうので、余白は Label 側につける）
+            self.banner_bar = tk.Frame(self.banner, width=6)
+            self.banner_bar.place(x=0, y=0, relheight=1.0)
         self.headline = tk.Label(self.banner, font=self.fonts["banner"], anchor="w", justify="left")
-        self.headline.pack(fill="x")
+        self.headline.pack(fill="x", padx=(22 if self.hud else 14, 14), pady=10)
 
         self.tree = ttk.Treeview(outer, columns=("domain", "country", "status"), show="headings",
                                  height=len(DEFAULT_DOMAINS) + 1, style="K.Treeview", selectmode="none")
@@ -1604,7 +1633,8 @@ class App:
         self.text = tk.Text(text_frame, font=self.fonts["body"], wrap="char", bg=c["panel"], fg=c["fg"],
                             relief="flat", padx=12, pady=10, highlightthickness=1,
                             highlightbackground=c["line"], height=10, insertbackground=c["fg"])
-        self.text.tag_configure("h", font=self.fonts["heading"], spacing1=4, spacing3=4)
+        self.text.tag_configure("h", font=self.fonts["heading"], foreground=c.get("accent", c["fg"]),
+                                spacing1=4, spacing3=4)
         self.text.tag_configure("p", lmargin1=8, lmargin2=22, spacing3=3)
         scroll = ttk.Scrollbar(text_frame, orient="vertical", command=self.text.yview)
         self.text.configure(yscrollcommand=scroll.set)
@@ -1673,6 +1703,7 @@ class App:
         for w in self.root.winfo_children():
             w.destroy()
         self.build_ui()
+        self._set_title_bar(self.hud or self.mode == "dark")
         self.apply_scale()
         self.apply_texts()
         self.btn_check.config(state="disabled" if self.checking else "normal")
@@ -1685,19 +1716,18 @@ class App:
             self._show_update(self.update_info)
 
     def toggle_view(self):
-        self.view = "standard" if self.friendly else "friendly"
+        order = ["hud", "friendly", "plain"]
+        self.view = order[(order.index(self.view) + 1) % len(order)]
         self.settings["view"] = self.view
         save_json("settings.json", self.settings)
         self.rebuild()
 
     # --- 見た目 ---
-    def _dark_title_bar(self):
-        if self.mode != "dark":
-            return
+    def _set_title_bar(self, dark):
         try:
             self.root.update()
             hwnd = ctypes.windll.user32.GetParent(self.root.winfo_id())
-            value = ctypes.c_int(1)
+            value = ctypes.c_int(1 if dark else 0)
             ctypes.windll.dwmapi.DwmSetWindowAttribute(hwnd, 20, ctypes.byref(value), ctypes.sizeof(value))
         except Exception:  # noqa: BLE001
             pass
@@ -1715,6 +1745,9 @@ class App:
                              foreground=c["fg"], bordercolor=c["line"], lightcolor=c.get("head_bg", c["panel"]),
                              darkcolor=c.get("head_bg", c["panel"]), relief="flat")
         self.style.map("K.Treeview.Heading", background=[("active", c.get("head_bg", c["panel"]))])
+        self.style.configure("Vertical.TScrollbar", background=c["line"], troughcolor=c["bg"], bordercolor=c["line"],
+                             lightcolor=c["line"], darkcolor=c["line"], arrowcolor=c.get("accent", c["muted"]))
+        self.style.map("Vertical.TScrollbar", background=[("active", c.get("accent", c["muted"]))])
         if self.friendly:  # ボタンの大きさを文字に合わせ直す
             for btn in (self.btn_check, self.btn_copy, self.btn_folder, self.btn_manual, self.btn_close,
                         self.btn_lang, self.btn_view, self.btn_update):
@@ -1746,7 +1779,7 @@ class App:
         self.shortcuts.config(text=self.t("shortcuts"))
         self.cb_auto.config(text=self.t("opt_autostart"))
         self.cb_update.config(text=self.t("opt_update"))
-        self.btn_view.config(text=self.t("btn_view_standard" if self.friendly else "btn_view_friendly"))
+        self.btn_view.config(text=self.t("view_label").format(name=self.t("view_" + self.view)))
         for btn, key in ((self.btn_check, "btn_check"), (self.btn_copy, "btn_copy"),
                          (self.btn_folder, "btn_folder"), (self.btn_manual, "btn_manual"),
                          (self.btn_lang, "btn_lang"), (self.btn_close, "btn_close"),
@@ -1778,8 +1811,10 @@ class App:
         if self.friendly:
             return
         fg, bg = self.c[key]
-        self.banner.config(bg=bg, highlightbackground=fg, highlightcolor=fg)
+        self.banner.config(bg=bg, highlightbackground=self.c["line"] if self.hud else fg, highlightcolor=fg)
         self.headline.config(text=text, bg=bg, fg=fg)
+        if self.banner_bar is not None:
+            self.banner_bar.config(bg=fg)
 
     # --- 設定（起動時の自動チェック・新しい版の確認）---
     def on_autostart(self):
