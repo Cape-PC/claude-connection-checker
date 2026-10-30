@@ -668,7 +668,8 @@ VPN_ADAPTER_WORDS = (
     "tunnelbear", "hotspot shield", "hide.me", "strongvpn", "ivpn", "pia ",
 )
 NOT_VPN_WORDS = ("hyper-v", "vethernet", "wsl", "vmware", "virtualbox", "loopback", "bluetooth",
-                 "wi-fi direct", "miniport", "isatap", "teredo", "6to4", "kernel debug")
+                 "wi-fi direct", "miniport", "isatap", "teredo", "6to4", "kernel debug", "ip-https",
+                 "pseudo-interface", "extension adapter")
 
 # このパソコンの接続一覧を読むだけ。何も変更しない。
 _PS_SCRIPT = r"""
@@ -1098,6 +1099,84 @@ def save_history(result, lang):
         return t["save_failed"].format(e=e.strerror)
 
 
+
+# ---------------------------------------------------------------- 診断情報（実機での確認用）
+
+def connection_stage_counts(data, claude_ips):
+    """Claude 関連のプロセスの接続が、どの段階で数えられるか（件数だけ。アドレスや名前は出さない）。"""
+    adapters = {int(a["idx"]): a for a in _listify(data.get("ads"))}
+    ip_idx = {str(i["ip"]).split("%")[0]: int(i["idx"]) for i in _listify(data.get("ips"))}
+    procs = {int(p["pid"]): p for p in _listify(data.get("procs"))}
+    kinds = {"claude.exe": {}, "node（Claude Code）": {}, "ブラウザ": {}}
+    for c in _listify(data.get("conns")):
+        proc = procs.get(int(c.get("pid", -1)))
+        if not proc:
+            continue
+        name = (proc.get("name") or "").lower()
+        cmd = (proc.get("cmd") or "").lower()
+        if name in APP_PROC_NAMES:
+            kind = "claude.exe"
+        elif name in SCRIPT_HOSTS and "claude" in cmd:
+            kind = "node（Claude Code）"
+        elif name in BROWSER_NAMES:
+            kind = "ブラウザ"
+        else:
+            continue
+        remote = str(c.get("ra", "")).split("%")[0]
+        local = str(c.get("la", "")).split("%")[0]
+        st = kinds[kind]
+        st["接続の数"] = st.get("接続の数", 0) + 1
+        if _is_public(remote):
+            st["外への接続"] = st.get("外への接続", 0) + 1
+            if kind == "ブラウザ" and remote in claude_ips:
+                st["Claudeの接続先への接続"] = st.get("Claudeの接続先への接続", 0) + 1
+            ad = adapters.get(ip_idx.get(local))
+            verdict = adapter_is_vpn(ad)
+            key = "VPN用アダプター経由" if verdict else "ふつうのアダプター経由" if verdict is False else "アダプター不明"
+            st[key] = st.get(key, 0) + 1
+        else:
+            try:
+                if ipaddress.ip_address(remote).is_loopback:
+                    st["このパソコン内への接続"] = st.get("このパソコン内への接続", 0) + 1
+            except ValueError:
+                pass
+    return kinds
+
+
+def build_diagnose_text():
+    import platform
+    now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    out = [f"回線チェッカー 診断情報 / Connection Checker diagnostics", f"版: {VERSION}   日時: {now}",
+           f"Windows: {platform.platform()}", "※IPアドレス・地域・プロバイダ名は含みません。", ""]
+    result = run_check()
+    out.append(f"[判定] {result['level']}")
+    for r in result["rows"] + [result["baseline"]]:
+        out.append(f"  {r['domain']}: {r['status']} / 国 {','.join(r['countries']) or '-'} / 経路 {r['families']} / 補足 {r['note']}")
+    apps = result.get("apps")
+    out.append("[アプリの通信の判定] " + (json.dumps(apps, ensure_ascii=False) if apps else "確認できませんでした"))
+    out.append(f"[VPNソフト] {[n for n, _ in result['vpn_software']] or 'なし'}   [Windowsのプロキシ設定] {result['proxy_setting']}")
+    out.append("")
+    try:
+        data = gather_connection_data()
+        out.append("[Claude関連の接続の内訳]")
+        for kind, st in connection_stage_counts(data, resolve_claude_ips(DEFAULT_DOMAINS)).items():
+            out.append(f"  {kind}: {st or '（接続なし）'}")
+        out.append("")
+        out.append("[ネットワークアダプター（名前 | 説明 | 物理か | VPN用と判定したか）]")
+        for a in _listify(data.get("ads")):
+            out.append(f"  {a.get('name')} | {a.get('desc')} | 物理={a.get('hw')} | VPN用={adapter_is_vpn(a)}")
+    except Exception as e:  # noqa: BLE001
+        out.append(f"[接続の読み取りに失敗] {type(e).__name__}")
+    return "\n".join(out) + "\n"
+
+
+def save_diagnose():
+    path = os.path.join(data_dir(), "diagnose.txt")
+    with open(path, "w", encoding="utf-8-sig") as f:
+        f.write(build_diagnose_text())
+    return path
+
+
 # ---------------------------------------------------------------- 画面
 
 TEXT["ja"].update({
@@ -1171,6 +1250,9 @@ TEXT["en"].update({
     "fr_pending": "Checking…",
 })
 TEXT["ja"].update({
+    "diag_running": "診断情報を作っています…",
+    "diag_saved": "診断情報を保存しました：{p}",
+    "diag_failed": "診断情報を保存できませんでした。",
     "fr_title": "回線チェッカー（非公式）",
     "fr_banner_safe": "BANされやすい接続ではありません",
     "fr_banner_caution": "気になるところがあります",
@@ -1181,6 +1263,9 @@ TEXT["ja"].update({
     "fr_badge_failed": "注意", "fr_badge_checking": "…",
 })
 TEXT["en"].update({
+    "diag_running": "Creating diagnostics…",
+    "diag_saved": "Saved diagnostics: {p}",
+    "diag_failed": "Could not save diagnostics.",
     "fr_title": "Connection Checker",
     "fr_banner_safe": "Unlikely to get you banned",
     "fr_banner_caution": "Something needs attention",
@@ -1190,8 +1275,8 @@ TEXT["en"].update({
     "fr_badge_safe": "SAFE", "fr_badge_caution": "CARE", "fr_badge_danger": "RISK",
     "fr_badge_failed": "CARE", "fr_badge_checking": "…",
 })
-TEXT["ja"]["shortcuts"] = "F5：再チェック　Esc：閉じる　Ctrl＋プラス／マイナス：文字の大きさ　Ctrl＋0：元の大きさ　Ctrl＋L：言語　Ctrl＋M：表示の切り替え"
-TEXT["en"]["shortcuts"] = "F5: check again   Esc: close   Ctrl + plus/minus: text size   Ctrl+0: reset size   Ctrl+L: language   Ctrl+M: switch view"
+TEXT["ja"]["shortcuts"] = "F5：再チェック　Esc：閉じる　Ctrl＋プラス／マイナス：文字の大きさ　Ctrl＋0：元の大きさ　Ctrl＋L：言語　Ctrl＋M：表示の切り替え　Ctrl＋D：診断情報の保存"
+TEXT["en"]["shortcuts"] = "F5: check again   Esc: close   Ctrl + plus/minus: text size   Ctrl+0: reset size   Ctrl+L: language   Ctrl+M: switch view   Ctrl+D: save diagnostics"
 
 # 「やさしい表示」で、出てきた言葉だけを説明する（検索する言葉, 見出し, 説明）
 FR_GLOSSARY = {
@@ -1271,9 +1356,9 @@ FR_PALETTE = {
 FONT = "Yu Gothic UI"
 FR_FONT_CANDIDATES = ("M PLUS Rounded 1c", "Kosugi Maru", "Yu Gothic UI")
 FONT_SPECS = {"title": (16, "bold"), "body": (10, "normal"), "bold": (10, "bold"),
-              "small": (9, "normal"), "banner": (14, "bold"), "heading": (11, "bold"), "badge": (10, "bold")}
+              "small": (9, "normal"), "banner": (14, "bold"), "heading": (11, "bold"), "badge": (10, "bold"), "sbold": (9, "bold")}
 FR_FONT_SPECS = {"title": (24, "bold"), "body": (11, "normal"), "bold": (11, "bold"),
-                 "small": (10, "normal"), "banner": (19, "bold"), "heading": (13, "bold"), "badge": (9, "bold")}
+                 "small": (10, "normal"), "banner": (19, "bold"), "heading": (13, "bold"), "badge": (9, "bold"), "sbold": (10, "bold")}
 SCALE_MIN, SCALE_MAX, SCALE_STEP = 0.8, 1.6, 0.1
 FR_CARD_ORDER = ("result", "todo", "why", "places", "words")
 
@@ -1509,27 +1594,29 @@ class RainbowTitle(tk.Canvas):
 class PillLabel(tk.Canvas):
     """角の丸い、色つきの小さなラベル（状態の表示用）。長い文は折り返す。"""
 
-    def __init__(self, master, bg, font, max_width=340):
+    def __init__(self, master, bg, font, max_width=340, pad_y=5):
         super().__init__(master, bg=bg, highlightthickness=0, bd=0)
-        self._font, self._max = font, max_width
+        self._font, self._max, self._pad_y = font, max_width, pad_y
 
     def set(self, text, fill, ink):
         self.delete("all")
         item = self.create_text(0, 0, text=text, font=self._font, width=self._max - 24, anchor="nw")
         x1, y1, x2, y2 = self.bbox(item)
         self.delete(item)
-        w, h = (x2 - x1) + 24, (y2 - y1) + 5
+        w, h = (x2 - x1) + 24, (y2 - y1) + self._pad_y
         tk.Canvas.configure(self, width=w, height=h)
         self.create_polygon(_round_points(1, 1, w - 1, h - 1, min(h / 2, 16)), smooth=True, fill=fill, outline=fill)
         self.create_text(w / 2, h / 2, text=text, font=self._font, fill=ink, width=self._max - 24, justify="center")
 
 
 class Mascot(tk.Canvas):
-    """帯に座るキャラクター。オリジナルの絵（mascot.png があれば、それを使う）。"""
+    """帯に座るキャラクター。表情が変わる（安全＝笑顔、要注意＝困り顔、危険＝びっくり、確認中＝考え中）。
+    オリジナルの絵。mascot.png があれば、表情は変わらず、その画像を使う。"""
 
     W, H = 130, 134
 
     def __init__(self, master, bg, image_paths=(), scale=0.72):
+        self._scale, self._mood = scale, "happy"
         self._w, self._h = int(self.W * scale), int(self.H * scale)
         super().__init__(master, width=self._w, height=self._h, bg=bg, highlightthickness=0, bd=0)
         self._image = None
@@ -1545,42 +1632,117 @@ class Mascot(tk.Canvas):
         if self._image is not None:
             self.create_image(self._w / 2, self._h, image=self._image, anchor="s")
         else:
-            self._draw()
-            self.scale("all", 0, 0, scale, scale)
+            self._redraw()
 
-    def _draw(self):
+    def set_mood(self, mood):
+        if self._image is None and mood != self._mood:
+            self._mood = mood
+            self._redraw()
+
+    def _redraw(self):
+        self.delete("all")
+        self._draw(self._mood)
+        self.scale("all", 0, 0, self._scale, self._scale)
+
+    def _draw(self, mood="happy"):
         c = self
+        brow = "#6e4629"
         # からだ（オレンジのベスト）
         c.create_polygon(_round_points(34, 94, 96, 130, 10), smooth=True, fill="#f4a259", outline="#d9823a", width=2)
         c.create_polygon(54, 94, 76, 94, 65, 110, fill="#fff4e6", outline="#e8cfae")
         c.create_oval(24, 100, 42, 126, fill="#f4a259", outline="#d9823a", width=2)
-        # 手をふる腕
-        c.create_line(90, 102, 110, 78, width=13, fill="#f4a259", capstyle="round")
-        c.create_oval(102, 62, 120, 80, fill="#ffe2c8", outline="#eeb995", width=2)
-        for dx in (-8, 0, 8):
-            c.create_line(111 + dx * 0.8, 58, 111 + dx * 1.3, 48, fill="#ff9ec7", width=3, capstyle="round")
-        # 頭
+        # 腕：笑顔とびっくりは手をふる／困り顔と考え中は、あごに手をあてる
+        if mood in ("happy", "surprised"):
+            c.create_line(90, 102, 110, 78, width=13, fill="#f4a259", capstyle="round")
+            c.create_oval(102, 62, 120, 80, fill="#ffe2c8", outline="#eeb995", width=2)
+            for dx in (-8, 0, 8):
+                c.create_line(111 + dx * 0.8, 58, 111 + dx * 1.3, 48, fill="#ff9ec7", width=3, capstyle="round")
+        else:
+            c.create_line(90, 104, 86, 86, width=13, fill="#f4a259", capstyle="round")
+        # 頭・かみの毛・ヘッドセット
         c.create_oval(29, 18, 101, 90, fill="#ffe2c8", outline="#eeb995", width=2)
-        # かみの毛
         c.create_polygon(27, 56, 30, 30, 50, 14, 80, 14, 100, 30, 103, 56, 93, 42, 80, 36, 64, 40, 48, 36, 36, 44,
                          smooth=True, fill="#8b5e3c", outline="#6e4629", width=2)
-        # ヘッドセット
         c.create_arc(25, 8, 105, 94, start=20, extent=140, style="arc", outline="#3b4a63", width=5)
         c.create_oval(22, 46, 36, 68, fill="#3b4a63", outline="#2b3650")
         c.create_oval(94, 46, 108, 68, fill="#3b4a63", outline="#2b3650")
         c.create_line(28, 66, 44, 82, width=3, fill="#3b4a63")
         c.create_oval(40, 78, 52, 88, fill="#3b4a63", outline="#2b3650")
-        # 目・ほほ・口
-        for ex in (47, 73):
-            c.create_oval(ex - 8, 50, ex + 8, 72, fill="#4aa3e8", outline="#2d6fb0", width=2)
-            c.create_oval(ex - 4, 56, ex + 4, 69, fill="#1d3f6e", outline="")
-            c.create_oval(ex - 3, 54, ex + 1, 59, fill="#ffffff", outline="")
-        c.create_oval(34, 70, 46, 77, fill="#ffb3b3", outline="")
-        c.create_oval(84, 70, 96, 77, fill="#ffb3b3", outline="")
-        c.create_arc(57, 66, 73, 80, start=210, extent=120, style="arc", outline="#c4544a", width=2)
-        # きらきら
-        c.create_polygon(16, 24, 19, 31, 26, 34, 19, 37, 16, 44, 13, 37, 6, 34, 13, 31, fill="#ffd966", outline="")
+        # 表情
+        if mood == "surprised":
+            for ex in (47, 73):
+                c.create_oval(ex - 10, 47, ex + 10, 73, fill="#ffffff", outline="#2d6fb0", width=2)
+                c.create_oval(ex - 5, 54, ex + 5, 67, fill="#1d3f6e", outline="")
+                c.create_oval(ex - 3, 56, ex + 1, 60, fill="#ffffff", outline="")
+            c.create_arc(36, 34, 58, 50, start=20, extent=140, style="arc", outline=brow, width=3)
+            c.create_arc(62, 34, 84, 50, start=20, extent=140, style="arc", outline=brow, width=3)
+            c.create_oval(59, 70, 71, 86, fill="#c4544a", outline="#a3413a", width=2)
+            c.create_oval(62, 78, 68, 85, fill="#ff9a9a", outline="")
+            c.create_text(18, 30, text="!", fill="#e04761", font=("Yu Gothic UI", 20, "bold"))
+        elif mood == "worried":
+            for ex in (47, 73):
+                c.create_oval(ex - 7, 52, ex + 7, 72, fill="#4aa3e8", outline="#2d6fb0", width=2)
+                c.create_oval(ex - 4, 58, ex + 4, 70, fill="#1d3f6e", outline="")
+                c.create_oval(ex - 3, 56, ex + 1, 60, fill="#ffffff", outline="")
+            c.create_line(37, 50, 55, 43, width=3, fill=brow, capstyle="round")
+            c.create_line(75, 43, 93, 50, width=3, fill=brow, capstyle="round")
+            c.create_arc(57, 74, 73, 86, start=30, extent=120, style="arc", outline="#c4544a", width=2)
+            c.create_polygon(99, 34, 94, 45, 99, 52, 104, 45, smooth=True, fill="#bfe3ff", outline="#6aa7ff")
+        elif mood == "thinking":
+            for ex in (47, 73):
+                c.create_oval(ex - 8, 50, ex + 8, 72, fill="#4aa3e8", outline="#2d6fb0", width=2)
+                c.create_oval(ex - 2, 54, ex + 6, 65, fill="#1d3f6e", outline="")
+                c.create_oval(ex + 1, 54, ex + 5, 58, fill="#ffffff", outline="")
+            c.create_line(37, 46, 55, 46, width=3, fill=brow, capstyle="round")
+            c.create_line(75, 42, 93, 46, width=3, fill=brow, capstyle="round")
+            c.create_line(60, 77, 71, 76, width=2, fill="#c4544a", capstyle="round")
+            for i, (dx, dy, r) in enumerate(((104, 30, 3), (112, 20, 4), (121, 8, 5))):
+                c.create_oval(dx - r, dy - r, dx + r, dy + r, fill="#ffffff", outline="#9ec9ea")
+        else:
+            for ex in (47, 73):
+                c.create_oval(ex - 8, 50, ex + 8, 72, fill="#4aa3e8", outline="#2d6fb0", width=2)
+                c.create_oval(ex - 4, 56, ex + 4, 69, fill="#1d3f6e", outline="")
+                c.create_oval(ex - 3, 54, ex + 1, 59, fill="#ffffff", outline="")
+            c.create_oval(34, 70, 46, 77, fill="#ffb3b3", outline="")
+            c.create_oval(84, 70, 96, 77, fill="#ffb3b3", outline="")
+            c.create_arc(57, 66, 73, 80, start=210, extent=120, style="arc", outline="#c4544a", width=2)
+            c.create_polygon(16, 24, 19, 31, 26, 34, 19, 37, 16, 44, 13, 37, 6, 34, 13, 31, fill="#ffd966", outline="")
+        if mood == "worried" or mood == "thinking":
+            c.create_oval(79, 76, 93, 92, fill="#ffe2c8", outline="#eeb995", width=2)  # あごに当てた手
 
+
+class BracketFrame(tk.Canvas):
+    """四隅にブラケット（かぎ括弧のような線）を描く枠。中身は self.inner（Frame）に置く。"""
+
+    def __init__(self, master, bg, color, pad=9, auto=False, arm=14):
+        super().__init__(master, bg=bg, highlightthickness=0, bd=0, height=20 if auto else 0)
+        self.color, self.pad, self.auto, self.arm = color, pad, auto, arm
+        self.inner = tk.Frame(self, bg=bg)
+        self._win = self.create_window(pad, pad, anchor="nw", window=self.inner)
+        self.bind("<Configure>", self._on_conf)
+        if auto:
+            self.inner.bind("<Configure>", self._on_inner)
+
+    def _on_conf(self, e):
+        opts = {"width": max(10, e.width - 2 * self.pad)}
+        if not self.auto:
+            opts["height"] = max(10, e.height - 2 * self.pad)
+        self.itemconfigure(self._win, **opts)
+        self._draw(e.width, e.height)
+
+    def _on_inner(self, e):
+        h = e.height + 2 * self.pad
+        if int(float(self.cget("height"))) != h:
+            self.configure(height=h)
+        self._draw(self.winfo_width(), h)
+
+    def _draw(self, w, h):
+        self.delete("br")
+        if w < 8 or h < 8:
+            return
+        a, p = self.arm, 2
+        for x, y, dx, dy in ((p, p, 1, 1), (w - p, p, -1, 1), (p, h - p, 1, -1), (w - p, h - p, -1, -1)):
+            self.create_line(x, y + dy * a, x, y, x + dx * a, y, fill=self.color, width=2, tags="br")
 
 
 class Card(tk.Canvas):
@@ -1688,6 +1850,7 @@ class App:
         self.update_info = None
         self.domains_cache, self.rows_cache = [], {}
         self.status_text, self.source_text = "", ""
+        self._compact, self._tick_id, self._anim = False, None, 0
         self.settings = load_json("settings.json", {})
         self.lang = self.settings.get("lang", "ja")
         if self.lang not in TEXT:
@@ -1723,6 +1886,8 @@ class App:
         for seq in ("<Control-minus>", "<Control-KP_Subtract>"):
             root.bind(seq, lambda e: self.change_scale(-SCALE_STEP))
         root.bind("<Control-0>", lambda e: self.change_scale(None))
+        root.bind("<Control-d>", lambda e: self.do_diagnose())
+        root.bind("<Configure>", self._on_root_configure, add="+")
 
         self.build_ui()
         self.apply_scale()
@@ -1743,7 +1908,7 @@ class App:
     def build_ui(self):
         self.c = HUD_PALETTE if self.hud else (FR_PALETTE if self.friendly else PALETTES[self.mode])
         self.root.configure(bg=self.c["bg"])
-        self.root.minsize(680, 860) if self.friendly else self.root.minsize(640, 700)
+        self.root.minsize(680, 620) if self.friendly else self.root.minsize(640, 700)
         if self.friendly:
             self._build_friendly()
         else:
@@ -1776,7 +1941,7 @@ class App:
         self.shortcuts.pack(fill="x", pady=(2, 0))
         parent.bind("<Configure>", lambda e: (self.notice.config(wraplength=max(300, e.width - 40)),
                                               self.shortcuts.config(wraplength=max(300, e.width - 40))))
-        opts = tk.Frame(parent, bg=c["bg"])
+        opts = self.footer_opts = tk.Frame(parent, bg=c["bg"])
         opts.pack(fill="x", pady=(8, 0))
         cb_kw = dict(bg=c["bg"], fg=c["fg"], activebackground=c["bg"], activeforeground=c["fg"],
                      selectcolor=c.get("check_bg", c["panel"]), font=self.fonts["small"], anchor="w", cursor="hand2",
@@ -1828,7 +1993,12 @@ class App:
         self.headline = tk.Label(self.banner, font=self.fonts["banner"], anchor="w", justify="left")
         self.headline.pack(fill="x", padx=(22 if self.hud else 14, 14), pady=10)
 
-        self.tree = ttk.Treeview(outer, columns=("domain", "country", "status"), show="headings",
+        tree_parent = outer
+        if self.hud:
+            tree_wrap = BracketFrame(outer, c["bg"], c["accent"], pad=8, auto=True)
+            tree_wrap.pack(fill="x", pady=(10, 0))
+            tree_parent = tree_wrap.inner
+        self.tree = ttk.Treeview(tree_parent, columns=("domain", "country", "status"), show="headings",
                                  height=len(DEFAULT_DOMAINS) + 1, style="K.Treeview", selectmode="none")
         for col, width in (("domain", 300), ("country", 90), ("status", 340)):
             self.tree.column(col, width=width, anchor="w")
@@ -1838,11 +2008,16 @@ class App:
         self.tree.tag_configure(UNKNOWN, foreground=c[UNKNOWN])
         self.tree.tag_configure("base", foreground=c["muted"])
         self.tree.tag_configure("pending", foreground=c["muted"])
-        self.tree.pack(fill="x", pady=(14, 4))
+        self.tree.pack(fill="x", pady=(0 if self.hud else 14, 4 if not self.hud else 0))
         self.source = tk.Label(outer, font=self.fonts["small"], bg=c["bg"], fg=c["muted"], anchor="w")
         self.source.pack(fill="x", pady=(0, 8))
 
-        text_frame = tk.Frame(outer, bg=c["bg"])
+        if self.hud:
+            text_wrap = BracketFrame(outer, c["bg"], c["accent"], pad=8, auto=False)
+            text_wrap.pack(fill="both", expand=True)
+            text_frame = tk.Frame(text_wrap.inner, bg=c["bg"])
+        else:
+            text_frame = tk.Frame(outer, bg=c["bg"])
         text_frame.pack(fill="both", expand=True)
         self.text = tk.Text(text_frame, font=self.fonts["body"], wrap="char", bg=c["panel"], fg=c["fg"],
                             relief="flat", padx=12, pady=10, highlightthickness=1,
@@ -1868,7 +2043,7 @@ class App:
         inner = self.panel.inner
         self.subtitle = tk.Label(inner)  # 使わない（apply_texts が文字を入れるだけ）
 
-        header = tk.Frame(inner, bg=c["bg"], height=100)
+        header = self.fr_header = tk.Frame(inner, bg=c["bg"], height=100)
         header.pack(fill="x")
         header.pack_propagate(False)
         self.title = RainbowTitle(header, c["bg"], self.fonts["title"])
@@ -1913,6 +2088,43 @@ class App:
         self.text.configure(yscrollcommand=scroll.set)
         scroll.pack(side="right", fill="y")
         self.text.pack(side="left", fill="both", expand=True)
+
+        self._compact = self._root_height() < 860
+        self._apply_compact_widgets()
+
+    def _root_height(self):
+        h = self.root.winfo_height()
+        if h <= 1:
+            try:
+                h = int(self.root.geometry().split("x")[1].split("+")[0])
+            except (IndexError, ValueError):
+                h = 1000
+        return h
+
+    def _apply_compact_widgets(self):
+        """画面が低いときは、キャラクターと注意書きを隠して、表と理由の欄が切れないようにする。"""
+        if not self.friendly:
+            return
+        self.fr_header.configure(height=64 if self._compact else 100)
+        if self._compact:
+            self.mascot.pack_forget()
+        else:
+            self.mascot.pack(side="left", anchor="s", padx=(12, 0), after=self.title)
+        self.notice.pack_forget()
+        if not self._compact:
+            self.notice.pack(fill="x", pady=(8, 0), before=self.footer_opts)
+
+    def _on_root_configure(self, e):
+        if e.widget is not self.root or not self.friendly:
+            return
+        compact = e.height < 860
+        if compact != self._compact:
+            self._compact = compact
+            self._apply_compact_widgets()
+            if self.result:
+                self.render(self.result)
+            elif self.checking:
+                self._replay_progress()
 
     def _on_backdrop(self, e):
         cv, w, h = self.backdrop, e.width, e.height
@@ -2111,6 +2323,9 @@ class App:
         self.btn_copy.config(state="disabled")
         self.set_status("")
         self.set_source("")
+        self._anim = 0
+        if self._tick_id is None:
+            self._tick_id = self.root.after(450, self._tick_checking)
         if self.friendly:
             self._fr_show_checking()
         else:
@@ -2120,6 +2335,23 @@ class App:
             self.text.delete("1.0", "end")
             self.text.config(state="disabled")
         threading.Thread(target=self._worker, daemon=True).start()
+
+    def _tick_checking(self):
+        """チェック中は、「チェックしています．．．」の点を動かす。"""
+        if not self.checking:
+            self._tick_id = None
+            return
+        self._anim += 1
+        dots = "." * (1 + self._anim % 3)
+        try:
+            if self.friendly:
+                self.banner_pill.set("checking", self.t("fr_badge_checking"), self.t("fr_banner_checking").rstrip("…") + dots)
+            else:
+                self.set_banner("checking", self.t("checking").rstrip("…") + dots)
+        except tk.TclError:
+            self._tick_id = None
+            return
+        self._tick_id = self.root.after(450, self._tick_checking)
 
     def _worker(self):
         try:
@@ -2270,6 +2502,8 @@ class App:
         body.columnconfigure(1, minsize=120)
         body.columnconfigure(2, weight=1)
         for col, key in enumerate(("col_domain", "col_country", "col_status")):
+            if self._compact:
+                break
             tk.Label(body, text=t(key), font=self.fonts["bold"], bg=c["table_head"], fg=c["fg"], anchor="w",
                      padx=12, pady=2).grid(row=0, column=col, sticky="ew", padx=(0 if col == 0 else 6, 0), pady=(0, 6))
         self.fr_rows = {}
@@ -2287,18 +2521,20 @@ class App:
                         t("row_browser") if key == "__browser__" else key)
                 country, status, tag = "—", t("fr_pending"), "pending"
             bold = key in domains
-            name_label = tk.Label(body, text=name, font=self.fonts["bold" if bold else "body"], bg=c["panel"],
+            fn, fb = (self.fonts["small"], self.fonts["sbold"]) if self._compact else (self.fonts["body"], self.fonts["bold"])
+            name_label = tk.Label(body, text=name, font=fb if bold else fn, bg=c["panel"],
                                   fg=c["fg"] if bold else c["muted"], anchor="w", justify="left", wraplength=280, padx=8)
-            name_label.grid(row=i, column=0, sticky="w", pady=1)
-            country_label = tk.Label(body, text=country, font=self.fonts["body"], bg=c["panel"], fg=c["fg"], anchor="w", padx=8)
+            name_label.grid(row=i, column=0, sticky="w", pady=0 if self._compact else 1)
+            country_label = tk.Label(body, text=country, font=fn, bg=c["panel"], fg=c["fg"], anchor="w", padx=8)
             country_label.grid(row=i, column=1, sticky="w")
-            pill = PillLabel(body, c["panel"], self.fonts["body"], max_width=270)
+            pill = PillLabel(body, c["panel"], fn, max_width=270, pad_y=0 if self._compact else 5)
             pill.grid(row=i, column=2, sticky="w", padx=(6, 0), pady=1)
             fill, ink = self._fr_pill_colors(tag)
             pill.set(status, fill, ink)
             self.fr_rows[key] = (country_label, pill)
         self.fr_source = tk.Label(body, text=self.source_text, font=self.fonts["small"], bg=c["panel"], fg=c["muted"], anchor="w")
-        self.fr_source.grid(row=len(keys) + 1, column=0, columnspan=3, sticky="w", pady=(6, 0), padx=8)
+        if not self._compact:
+            self.fr_source.grid(row=len(keys) + 1, column=0, columnspan=3, sticky="w", pady=(6, 0), padx=8)
 
     def _fr_row_set(self, key, row):
         if key not in self.fr_rows:
@@ -2313,6 +2549,7 @@ class App:
         t = self.t
         level = {"safe": "safe", "caution": "caution", "danger": "danger", "failed": "caution"}.get(name, "checking")
         self.banner_pill.set(level, t("fr_badge_" + name), t("fr_banner_" + name))
+        self.mascot.set_mood({"safe": "happy", "caution": "worried", "failed": "worried", "danger": "surprised"}.get(name, "thinking"))
 
     def _fr_show_checking(self):
         self._fr_banner("checking")
@@ -2351,7 +2588,20 @@ class App:
         if level != SAFE:  # 要注意・危険のときは、「やること」が見えるところまでスクロールしておく
             pos = self.text.search(t("actions"), "1.0")
             if pos:
-                self.text.yview(pos)
+                self.root.after(120, lambda: self.text.yview(pos))
+
+    def do_diagnose(self):
+        """診断情報（件数と判定だけ）を、ファイルに保存する。VPNを使うパソコンでの確認に使う。"""
+        self.set_status(self.t("diag_running"))
+
+        def work():
+            try:
+                path = save_diagnose()
+                self.root.after(0, lambda: (self.set_status(self.t("diag_saved").format(p=path)), os.startfile(data_dir())))
+            except Exception:  # noqa: BLE001
+                self.root.after(0, lambda: self.set_status(self.t("diag_failed")))
+
+        threading.Thread(target=work, daemon=True).start()
 
     def copy_domains(self):
         if not self.result:
@@ -2377,6 +2627,17 @@ class App:
 
 
 def main():
+    if "--diagnose" in sys.argv[1:]:
+        try:
+            path = save_diagnose()
+            message = f"診断情報を保存しました。\n{path}"
+        except Exception as e:  # noqa: BLE001
+            message = f"診断情報を保存できませんでした。\n{type(e).__name__}"
+        try:
+            ctypes.windll.user32.MessageBoxW(0, message, "回線チェッカー", 0x40)
+        except Exception:  # noqa: BLE001
+            print(message)
+        return
     try:
         ctypes.windll.shcore.SetProcessDpiAwareness(1)
     except Exception:  # noqa: BLE001

@@ -145,13 +145,15 @@ th { color: var(--muted); font-weight: 700; white-space: nowrap; }
     <h3>表示を切り替える（ダーク・⁠やさしい・⁠ふつう）</h3>
     <p>はじめて開いたときは、<br>暗い背景の<b><wbr>「⁠ダ⁠ー⁠ク⁠」</b>表示です。<br>画面の右上の<wbr>「⁠表⁠示⁠：⁠ダ⁠ー⁠ク⁠」を押す（または<code>Ctrl</code> + <code>M</code>）と、<br><wbr>「⁠や⁠さ⁠し⁠い⁠」→<wbr>「⁠ふ⁠つ⁠う⁠」→<wbr>「⁠ダ⁠ー⁠ク⁠」の順に切り替わります。<br>選んだ表示は、<br>次に開いたときも使われます。</p>
     <ul>
-      <li><b>ダーク</b>：暗い背景に、<br>ネオンの緑とシアンを使った表示です。</li>
-      <li><b>やさしい</b>：パステルカラーのかわいい見た目です。<br>空色の枠に、<br>虹色のタイトルとキャラクターが出ます。<br>結果は、<br>丸い帯と、<br>色つきのラベルで出ます。<br><wbr>「⁠理⁠由⁠」と<wbr>「⁠や⁠る⁠こ⁠と⁠」は、<br>羊皮紙のような欄に出て、<br>要注意・⁠危険のときは、<br><wbr>「⁠や⁠る⁠こ⁠と⁠」が見えるところまで自動でスクロールします。<br>VPN、<br>プロキシ、<br>BANなどのむずかしい言葉は、<br>その欄の終わりの<wbr>「⁠こ⁠と⁠ば⁠の⁠説⁠明⁠」で、<br>出てきた言葉だけを説明します。</li>
+      <li><b>ダーク</b>：暗い背景に、<br>ネオンの緑とシアンを使った表示です。<br>表と理由の欄の四隅に、<br>ブラケット（かぎ括弧のような線）が付きます。<br>チェック中は、<br><wbr>「⁠チ⁠ェ⁠ッ⁠ク⁠中⁠」の点が動きます。</li>
+      <li><b>やさしい</b>：パステルカラーのかわいい見た目です。<br>空色の枠に、<br>虹色のタイトルとキャラクターが出ます。<br>キャラクターの表情は、<br>結果によって変わります（安全＝笑顔、<br>要注意＝困り顔、<br>危険＝びっくり、<br>チェック中＝考え中）。<br>結果は、<br>丸い帯と、<br>色つきのラベルで出ます。<br><wbr>「⁠理⁠由⁠」と<wbr>「⁠や⁠る⁠こ⁠と⁠」は、<br>羊皮紙のような欄に出て、<br>要注意・⁠危険のときは、<br><wbr>「⁠や⁠る⁠こ⁠と⁠」が見えるところまで自動でスクロールします。<br>VPN、<br>プロキシ、<br>BANなどのむずかしい言葉は、<br>その欄の終わりの<wbr>「⁠こ⁠と⁠ば⁠の⁠説⁠明⁠」で、<br>出てきた言葉だけを説明します。</li>
       <li><b>ふつう</b>：明るい色の、<br>シンプルな表示です。</li>
     </ul>
     <p>判定の中身は、<br>どの表示でも同じです。</p>
     <p><wbr>「⁠や⁠さ⁠し⁠い⁠」のキャラクターは、<br>好きな画像に変えられます。<br>背景が透明なPNGを<code>mascot.png</code>という名前にして、<br>アプリと同じフォルダに置いてください（<code>%LOCALAPPDATA%\KaisenChecker</code>のフォルダでも使えます）。</p>
     <figure style="margin:0 0 12px"><img src="画面_やさしい.png" alt="やさしい表示の画面。パステルの背景に、虹色のタイトルとキャラクター、緑色の丸い帯に安全と出て、表と理由の欄が続いている。" style="width:100%;max-width:560px;height:auto;border:1px solid var(--line);border-radius:6px;display:block"><figcaption style="font-size:0.8rem;color:var(--muted);margin-top:6px"><wbr>「⁠や⁠さ⁠し⁠い⁠」表示の画面</figcaption></figure>
+    <h3>画面が小さいとき</h3>
+    <p><wbr>「⁠や⁠さ⁠し⁠い⁠」表示で、<br>ウィンドウの高さが低いときは、<br>キャラクターと注意書きを隠して、<br>表の見出しを省き、<br>文字を小さくして、<br>理由の欄が残るようにします。<br>ウィンドウを大きくすると、<br>元に戻ります。</p>
     <h3>キーボードで操作する</h3>
     <div class="table-wrap">
       <table>
@@ -163,6 +165,7 @@ th { color: var(--muted); font-weight: 700; white-space: nowrap; }
           <tr><td><code>Ctrl</code> + <code>0</code></td><td>文字の大きさを元に戻す</td></tr>
           <tr><td><code>Ctrl</code> + <code>L</code></td><td>日本語と英語を切り替える</td></tr>
           <tr><td><code>Ctrl</code> + <code>M</code></td><td>表示を切り替える（ダーク → やさしい → ふつう）</td></tr>
+          <tr><td><code>Ctrl</code> + <code>D</code></td><td>診断情報を保存する</td></tr>
         </tbody>
       </table>
     </div>
@@ -188,6 +191,16 @@ th { color: var(--muted); font-weight: 700; white-space: nowrap; }
     </div>
     <p>調べられるのは、<br>TCPの通信です。<br>ブラウザがQUIC（UDPを使う通信）で接続している場合は、<br>見えません。<br>ブラウザの結果は、<br>Claudeの接続先に対する通信だけを数えます。</p>
     <p>接続の一覧は、<br>判定のためだけに読み、<br>画面にも履歴にも、<br>保存も送信もしません。</p>
+    <h3>診断情報を保存する（結果が実際と合わないとき）</h3>
+    <p><code>Ctrl</code> + <code>D</code>を押すと、<br>診断情報が<code>%LOCALAPPDATA%\KaisenChecker\diagnose.txt</code>に保存されて、<br>そのフォルダが開きます。<br>exeを<code>--diagnose</code>をつけて起動しても、<br>同じものが保存されます（画面は開きません）。</p>
+    <p>診断情報には、<br>次のものが入ります。<b>IPアドレス、<br>場所、<br>プロバイダ名は入りません。</b></p>
+    <ul>
+      <li>判定の結果（ドメインごとの状態）。</li>
+      <li>Claudeアプリ・⁠Claude Code・⁠ブラウザの接続が、<br>どの段階で数えられたかの<b>件数</b>。</li>
+      <li>ネットワークアダプターの名前と、<br>VPN用と判定したかどうか。</li>
+      <li>動いているVPNソフトの名前と、<br>Windowsのプロキシ設定。</li>
+    </ul>
+    <p>VPNを使っているパソコンで、<br>結果が実際と合わないときに、<br>この内容を作者に伝えると、<br>原因を調べやすくなります。<br>共有する前に、<br>中身を確認してください。</p>
     <h3>前回との比較</h3>
     <p>前回の結果（<code>last.json</code>）と比べて、<br>結論が変わったときは、<br><wbr>「⁠理⁠由⁠」の先頭にそのことを書きます。<br>VPNを入れ直して除外が消えたときなどに、<br>すぐ気づけます。</p>
   </section>
