@@ -1170,6 +1170,26 @@ TEXT["en"].update({
     "fr_row_browser": "Browser to Claude (actual traffic)",
     "fr_pending": "Checking…",
 })
+TEXT["ja"].update({
+    "fr_title": "回線チェッカー（非公式）",
+    "fr_banner_safe": "BANされやすい接続ではありません",
+    "fr_banner_caution": "気になるところがあります",
+    "fr_banner_danger": "BANされやすい接続です",
+    "fr_banner_failed": "チェックできませんでした",
+    "fr_banner_checking": "チェックしています…",
+    "fr_badge_safe": "安全", "fr_badge_caution": "要注意", "fr_badge_danger": "危険",
+    "fr_badge_failed": "注意", "fr_badge_checking": "…",
+})
+TEXT["en"].update({
+    "fr_title": "Connection Checker",
+    "fr_banner_safe": "Unlikely to get you banned",
+    "fr_banner_caution": "Something needs attention",
+    "fr_banner_danger": "Likely to get you banned",
+    "fr_banner_failed": "Couldn't check",
+    "fr_banner_checking": "Checking…",
+    "fr_badge_safe": "SAFE", "fr_badge_caution": "CARE", "fr_badge_danger": "RISK",
+    "fr_badge_failed": "CARE", "fr_badge_checking": "…",
+})
 TEXT["ja"]["shortcuts"] = "F5：再チェック　Esc：閉じる　Ctrl＋プラス／マイナス：文字の大きさ　Ctrl＋0：元の大きさ　Ctrl＋L：言語　Ctrl＋M：表示の切り替え"
 TEXT["en"]["shortcuts"] = "F5: check again   Esc: close   Ctrl + plus/minus: text size   Ctrl+0: reset size   Ctrl+L: language   Ctrl+M: switch view"
 
@@ -1233,36 +1253,27 @@ HUD_PALETTE = {
     "disabled": "#3d5666",
 }
 # 「やさしい表示」の配色：取説と同じ、ティールとピンクの2色＋白
-FR_PALETTES = {
-    "light": {
-        "bg": "#ffffff", "fg": "#22304a", "muted": "#5d6880", "line": "#d6dee8", "panel": "#eef3f8",
-        "band": "#e3f4f5", "teal": "#0e7c86", "pink": "#e0457b", "pink_soft": "#fde8f0",
-        SAFE: ("#1a7431", "#e6f4ea"), CAUTION: ("#9a5b00", "#fff4d6"), DANGER: ("#b4232d", "#fde4e1"),
-        "checking": ("#2f5bd3", "#e9eefc"), UNKNOWN: "#5d6880",
-        "primary": ("#0e7c86", "#0b6a73", "#085760", "#ffffff"),
-        "secondary": ("#e0457b", "#c93a6c", "#b02f5c", "#ffffff"),
-        "plain": ("#e3f4f5", "#cfe9eb", "#bcdde0", "#0e7c86"),
-        "band_btn": ("#ffffff", "#f3fbfc", "#e0f0f2", "#0e7c86"),
-        "disabled": "#9aa9b8", "disabled_bg": "#e6ebf1",
-    },
-    "dark": {
-        "bg": "#141922", "fg": "#e7ecf3", "muted": "#9ba7bb", "line": "#2c3544", "panel": "#1d2430",
-        "band": "#13313a", "teal": "#4fc3cc", "pink": "#ff7ba6", "pink_soft": "#3a1a28",
-        SAFE: ("#6fd39c", "#15301f"), CAUTION: ("#ffb35c", "#3a2f10"), DANGER: ("#ff8a80", "#3b1714"),
-        "checking": ("#9db5ff", "#1c2540"), UNKNOWN: "#9ba7bb",
-        "primary": ("#2a98a3", "#34a8b3", "#1f7f89", "#ffffff"),
-        "secondary": ("#c9457b", "#d9588c", "#b03a68", "#ffffff"),
-        "plain": ("#1c3d47", "#24505c", "#17323b", "#7fd8df"),
-        "band_btn": ("#1d2430", "#263040", "#18202c", "#7fd8df"),
-        "disabled": "#5b6475", "disabled_bg": "#262e3b",
-    },
+FR_PALETTE = {
+    "bg": "#a9dcf8", "fg": "#23415f", "muted": "#456a8c", "line": "#d4ecfb", "panel": "#ffffff",
+    "backdrop_mid": "#bfe5ff", "panel_border": "#e3f5ff", "table_head": "#dff3ff",
+    "parchment": "#fbf0d8", "parchment_border": "#c79a5b", "ink": "#4a3a2a", "muted_ink": "#7b6548",
+    "heading": "#7a4f2a", "ok": "#5cc94d", "pink": "#e0457b", "check_bg": "#ffffff",
+    SAFE: ("#3da53a", "#e6f4ea"), CAUTION: ("#b36b00", "#fff4d6"), DANGER: ("#cf222e", "#fde4e1"),
+    "checking": ("#2f5bd3", "#e9eefc"), UNKNOWN: "#456a8c",
+    "primary": ("#4f8fe8", "#3f7fd8", "#2f6fc8", "#ffffff"),
+    "secondary": ("#3b4766", "#4b5878", "#2b3650", "#ffffff"),
+    "plain": ("#c5cbe0", "#b5bdd6", "#a5aecb", "#3b4766"),
+    "header_btn": ("#d9efff", "#c8e6fb", "#b5dcf5", "#2f6fa8"),
+    "manual": ("#8fd0f5", "#7fc2ea", "#6fb3dc", "#1d4f73"),
+    "close": ("#f0626f", "#e0525f", "#d0424f", "#ffffff"),
+    "disabled": "#8fa3b8", "disabled_bg": "#d5e6f3",
 }
 FONT = "Yu Gothic UI"
 FR_FONT_CANDIDATES = ("M PLUS Rounded 1c", "Kosugi Maru", "Yu Gothic UI")
 FONT_SPECS = {"title": (16, "bold"), "body": (10, "normal"), "bold": (10, "bold"),
-              "small": (9, "normal"), "banner": (14, "bold"), "heading": (11, "bold")}
-FR_FONT_SPECS = {"title": (20, "bold"), "body": (11, "normal"), "bold": (11, "bold"),
-                 "small": (10, "normal"), "banner": (18, "bold"), "heading": (13, "bold")}
+              "small": (9, "normal"), "banner": (14, "bold"), "heading": (11, "bold"), "badge": (10, "bold")}
+FR_FONT_SPECS = {"title": (24, "bold"), "body": (11, "normal"), "bold": (11, "bold"),
+                 "small": (10, "normal"), "banner": (19, "bold"), "heading": (13, "bold"), "badge": (9, "bold")}
 SCALE_MIN, SCALE_MAX, SCALE_STEP = 0.8, 1.6, 0.1
 FR_CARD_ORDER = ("result", "todo", "why", "places", "words")
 
@@ -1289,16 +1300,31 @@ def _round_points(x1, y1, x2, y2, r):
             x2 - r, y2, x1 + r, y2, x1, y2, x1, y2 - r, x1, y1 + r, x1, y1]
 
 
+def _hex_rgb(color):
+    color = color.lstrip("#")
+    return tuple(int(color[i:i + 2], 16) for i in (0, 2, 4))
+
+
+def _lerp_color(c1, c2, t):
+    a, b = _hex_rgb(c1), _hex_rgb(c2)
+    return "#%02x%02x%02x" % tuple(round(a[i] + (b[i] - a[i]) * t) for i in range(3))
+
+
+def _shade(color, factor):
+    r, g, b = _hex_rgb(color)
+    return "#%02x%02x%02x" % (min(255, int(r * factor)), min(255, int(g * factor)), min(255, int(b * factor)))
+
+
 class PillButton(tk.Canvas):
-    """角の丸い（丸薬の形の）ボタン。ホバーで色が変わり、押すと少し沈む。HoverButton と同じ使い方ができる。"""
+    """角の丸い（丸薬の形の）ボタン。立体感の影つき。ホバーで色が変わり、押すと沈む。HoverButton と同じ使い方ができる。"""
 
     def __init__(self, master, colors, disabled_fg, font, text="", command=None,
-                 outer_bg=None, disabled_bg="#e6ebf1", padx=18, pady=8, **_ignored):
+                 outer_bg=None, disabled_bg="#e6ebf1", padx=18, pady=8, depth=0, **_ignored):
         self._cols = colors
         self._disabled_fg, self._disabled_bg = disabled_fg, disabled_bg
         self._font, self._text, self._command = font, text, command
         self._state, self._hover, self._pressed = "normal", False, False
-        self._padx, self._pady = padx, pady
+        self._padx, self._pady, self._depth = padx, pady, depth
         super().__init__(master, bg=outer_bg or master.cget("bg"), highlightthickness=0, bd=0, cursor="hand2")
         self.bind("<Enter>", self._enter)
         self.bind("<Leave>", self._leave)
@@ -1308,7 +1334,7 @@ class PillButton(tk.Canvas):
 
     def _layout(self):
         self._pw = self._font.measure(self._text) + 2 * self._padx
-        self._ph = self._font.metrics("linespace") + 2 * self._pady
+        self._ph = self._font.metrics("linespace") + 2 * self._pady + self._depth
         tk.Canvas.configure(self, width=self._pw, height=self._ph)
         self._draw()
 
@@ -1319,10 +1345,15 @@ class PillButton(tk.Canvas):
             fill, ink = self._disabled_bg, self._disabled_fg
         else:
             fill, ink = (active if self._pressed else hover if self._hover else bg), fg
-        r = self._ph / 2
-        self.create_polygon(_round_points(1, 1, self._pw - 1, self._ph - 1, r), smooth=True, fill=fill, outline=fill)
-        self.create_text(self._pw / 2, self._ph / 2 + (1 if self._pressed else 0), text=self._text,
-                         font=self._font, fill=ink)
+        body_h = self._ph - self._depth
+        r = body_h / 2
+        shift = self._depth if (self._pressed and self._state != "disabled") else 0
+        if self._depth and not shift:
+            self.create_polygon(_round_points(1, 1 + self._depth, self._pw - 1, self._ph - 1, r), smooth=True,
+                                fill=_shade(fill, 0.78), outline=_shade(fill, 0.78))
+        self.create_polygon(_round_points(1, 1 + shift, self._pw - 1, body_h - 1 + shift, r), smooth=True,
+                            fill=fill, outline=fill)
+        self.create_text(self._pw / 2, body_h / 2 + shift, text=self._text, font=self._font, fill=ink)
 
     def _enter(self, _e):
         self._hover = True
@@ -1344,6 +1375,10 @@ class PillButton(tk.Canvas):
         if was and self._state != "disabled" and 0 <= e.x <= self._pw and 0 <= e.y <= self._ph and self._command:
             self._command()
 
+    def set_colors(self, colors):
+        self._cols = colors
+        self._draw()
+
     def configure(self, cnf=None, **kw):
         if cnf:
             kw.update(cnf)
@@ -1352,7 +1387,7 @@ class PillButton(tk.Canvas):
             self._text, changed = kw.pop("text"), True
         if "state" in kw:
             self._state = kw.pop("state")
-            self.configure_cursor()
+            tk.Canvas.configure(self, cursor="arrow" if self._state == "disabled" else "hand2")
             changed = True
         if "command" in kw:
             self._command = kw.pop("command")
@@ -1363,11 +1398,189 @@ class PillButton(tk.Canvas):
 
     config = configure
 
-    def configure_cursor(self):
-        tk.Canvas.configure(self, cursor="arrow" if self._state == "disabled" else "hand2")
-
     def __getitem__(self, key):
         return self._state if key == "state" else super().__getitem__(key)
+
+
+class FillPanel(tk.Canvas):
+    """親いっぱいに広がる、角の丸いパネル。中身は self.inner（Frame）に置く。"""
+
+    def __init__(self, master, outer_bg, fill, border, radius=24, pad=14, border_w=4):
+        super().__init__(master, bg=outer_bg, highlightthickness=0, bd=0)
+        self.fill, self.border, self.radius, self.pad, self.bw = fill, border, radius, pad, border_w
+        self.inner = tk.Frame(self, bg=fill)
+        self._win = self.create_window(pad, pad, anchor="nw", window=self.inner)
+        self.bind("<Configure>", self._on_conf)
+
+    def _on_conf(self, e):
+        self.itemconfigure(self._win, width=max(10, e.width - 2 * self.pad), height=max(10, e.height - 2 * self.pad))
+        self.delete("bg")
+        if e.width < 8:
+            return
+        self.create_polygon(_round_points(2, 2, e.width - 2, e.height - 2, self.radius), smooth=True,
+                            fill=self.fill, outline=self.border, width=self.bw, tags="bg")
+        self.tag_lower("bg")
+
+
+LEVEL_STYLE = {"safe": ("#5cc94d", "#3da53a"), "caution": ("#ffbf3f", "#e09a14"),
+               "danger": ("#ff6f87", "#e04761"), "checking": ("#6aa7ff", "#4a86e0")}
+
+
+class BannerPill(tk.Canvas):
+    """結果を出す、緑（黄・赤）の丸い帯。左にバッジ、右にアイコン。"""
+
+    def __init__(self, master, bg, fonts):
+        super().__init__(master, bg=bg, highlightthickness=0, bd=0, height=78)
+        self.fonts = fonts
+        self.state = ("checking", "", "")
+        self.bind("<Configure>", lambda e: self.draw())
+
+    def set(self, level, badge, text):
+        self.state = (level, badge, text)
+        self.draw()
+
+    def draw(self):
+        self.delete("all")
+        w, h = self.winfo_width(), 78
+        if w < 120:
+            return
+        level, badge, text = self.state
+        main, dark = LEVEL_STYLE[level]
+        r = (h - 8) / 2
+        self.create_polygon(_round_points(2, 8, w - 2, h - 2, r), smooth=True, fill=dark, outline=dark)
+        self.create_polygon(_round_points(2, 2, w - 2, h - 8, r), smooth=True, fill=main, outline=_lerp_color(main, "#ffffff", 0.45), width=2)
+        cy = (h - 6) / 2
+        # バッジ
+        self.create_oval(14, cy - 28, 70, cy + 28, fill="#fff4dc", outline="#f2a64a", width=4)
+        self.create_oval(21, cy - 21, 63, cy + 21, fill="#ffffff", outline="#f7cf8e", width=1)
+        self.create_text(42, cy, text=badge, fill=dark, font=self.fonts["badge"])
+        # 文字（影つき）
+        self.create_text(88, cy + 2, text=text, anchor="w", fill=dark, font=self.fonts["banner"])
+        self.create_text(86, cy, text=text, anchor="w", fill="#ffffff", font=self.fonts["banner"])
+        # 右のアイコン
+        ix = w - 52
+        if level == "safe":
+            self.create_line(ix - 16, cy + 2, ix - 5, cy + 14, ix + 18, cy - 14, fill="#ffffff", width=8, capstyle="round", joinstyle="round")
+        elif level == "danger":
+            self.create_line(ix - 13, cy - 13, ix + 13, cy + 13, fill="#ffffff", width=8, capstyle="round")
+            self.create_line(ix + 13, cy - 13, ix - 13, cy + 13, fill="#ffffff", width=8, capstyle="round")
+        elif level == "caution":
+            self.create_text(ix, cy, text="!", fill="#ffffff", font=("Yu Gothic UI", 30, "bold"))
+        else:
+            for i in range(3):
+                self.create_oval(ix - 20 + i * 16, cy - 4, ix - 12 + i * 16, cy + 4, fill="#ffffff", outline="#ffffff")
+
+
+RAINBOW = ("#ff6b8b", "#ff9f43", "#f2bd2f", "#5ac85a", "#38b6e8", "#5b7cff", "#a97bff")
+
+
+class RainbowTitle(tk.Canvas):
+    """文字ごとに色の違う、ふち取りのタイトル。"""
+
+    def __init__(self, master, bg, font):
+        super().__init__(master, bg=bg, highlightthickness=0, bd=0)
+        self._font, self._text = font, ""
+        self._render()
+
+    def configure(self, cnf=None, **kw):
+        if cnf:
+            kw.update(cnf)
+        if "text" in kw:
+            self._text = kw.pop("text")
+            self._render()
+        if kw:
+            tk.Canvas.configure(self, **kw)
+
+    config = configure
+
+    def _render(self):
+        self.delete("all")
+        h = self._font.metrics("linespace") + 12
+        x = 8
+        for i, ch in enumerate(self._text):
+            w = self._font.measure(ch)
+            for dx, dy in ((-2, 0), (2, 0), (0, -2), (0, 2), (-2, -2), (2, 2), (-2, 2), (2, -2)):
+                self.create_text(x + dx, h / 2 + dy, text=ch, anchor="w", font=self._font, fill="#ffffff")
+            self.create_text(x, h / 2, text=ch, anchor="w", font=self._font, fill=RAINBOW[i % len(RAINBOW)])
+            x += w
+        tk.Canvas.configure(self, width=x + 14, height=h)
+
+
+class PillLabel(tk.Canvas):
+    """角の丸い、色つきの小さなラベル（状態の表示用）。長い文は折り返す。"""
+
+    def __init__(self, master, bg, font, max_width=340):
+        super().__init__(master, bg=bg, highlightthickness=0, bd=0)
+        self._font, self._max = font, max_width
+
+    def set(self, text, fill, ink):
+        self.delete("all")
+        item = self.create_text(0, 0, text=text, font=self._font, width=self._max - 24, anchor="nw")
+        x1, y1, x2, y2 = self.bbox(item)
+        self.delete(item)
+        w, h = (x2 - x1) + 24, (y2 - y1) + 5
+        tk.Canvas.configure(self, width=w, height=h)
+        self.create_polygon(_round_points(1, 1, w - 1, h - 1, min(h / 2, 16)), smooth=True, fill=fill, outline=fill)
+        self.create_text(w / 2, h / 2, text=text, font=self._font, fill=ink, width=self._max - 24, justify="center")
+
+
+class Mascot(tk.Canvas):
+    """帯に座るキャラクター。オリジナルの絵（mascot.png があれば、それを使う）。"""
+
+    W, H = 130, 134
+
+    def __init__(self, master, bg, image_paths=(), scale=0.72):
+        self._w, self._h = int(self.W * scale), int(self.H * scale)
+        super().__init__(master, width=self._w, height=self._h, bg=bg, highlightthickness=0, bd=0)
+        self._image = None
+        for path in image_paths:
+            if os.path.exists(path):
+                try:
+                    img = tk.PhotoImage(file=path)
+                    factor = max(1, -(-img.height() // self._h), -(-img.width() // self._w))
+                    self._image = img.subsample(factor, factor) if factor > 1 else img
+                    break
+                except tk.TclError:
+                    self._image = None
+        if self._image is not None:
+            self.create_image(self._w / 2, self._h, image=self._image, anchor="s")
+        else:
+            self._draw()
+            self.scale("all", 0, 0, scale, scale)
+
+    def _draw(self):
+        c = self
+        # からだ（オレンジのベスト）
+        c.create_polygon(_round_points(34, 94, 96, 130, 10), smooth=True, fill="#f4a259", outline="#d9823a", width=2)
+        c.create_polygon(54, 94, 76, 94, 65, 110, fill="#fff4e6", outline="#e8cfae")
+        c.create_oval(24, 100, 42, 126, fill="#f4a259", outline="#d9823a", width=2)
+        # 手をふる腕
+        c.create_line(90, 102, 110, 78, width=13, fill="#f4a259", capstyle="round")
+        c.create_oval(102, 62, 120, 80, fill="#ffe2c8", outline="#eeb995", width=2)
+        for dx in (-8, 0, 8):
+            c.create_line(111 + dx * 0.8, 58, 111 + dx * 1.3, 48, fill="#ff9ec7", width=3, capstyle="round")
+        # 頭
+        c.create_oval(29, 18, 101, 90, fill="#ffe2c8", outline="#eeb995", width=2)
+        # かみの毛
+        c.create_polygon(27, 56, 30, 30, 50, 14, 80, 14, 100, 30, 103, 56, 93, 42, 80, 36, 64, 40, 48, 36, 36, 44,
+                         smooth=True, fill="#8b5e3c", outline="#6e4629", width=2)
+        # ヘッドセット
+        c.create_arc(25, 8, 105, 94, start=20, extent=140, style="arc", outline="#3b4a63", width=5)
+        c.create_oval(22, 46, 36, 68, fill="#3b4a63", outline="#2b3650")
+        c.create_oval(94, 46, 108, 68, fill="#3b4a63", outline="#2b3650")
+        c.create_line(28, 66, 44, 82, width=3, fill="#3b4a63")
+        c.create_oval(40, 78, 52, 88, fill="#3b4a63", outline="#2b3650")
+        # 目・ほほ・口
+        for ex in (47, 73):
+            c.create_oval(ex - 8, 50, ex + 8, 72, fill="#4aa3e8", outline="#2d6fb0", width=2)
+            c.create_oval(ex - 4, 56, ex + 4, 69, fill="#1d3f6e", outline="")
+            c.create_oval(ex - 3, 54, ex + 1, 59, fill="#ffffff", outline="")
+        c.create_oval(34, 70, 46, 77, fill="#ffb3b3", outline="")
+        c.create_oval(84, 70, 96, 77, fill="#ffb3b3", outline="")
+        c.create_arc(57, 66, 73, 80, start=210, extent=120, style="arc", outline="#c4544a", width=2)
+        # きらきら
+        c.create_polygon(16, 24, 19, 31, 26, 34, 19, 37, 16, 44, 13, 37, 6, 34, 13, 31, fill="#ffd966", outline="")
+
 
 
 class Card(tk.Canvas):
@@ -1499,7 +1712,7 @@ class App:
         root.minsize(640, 700)
         if background:
             root.withdraw()
-        self._set_title_bar(self.view == "hud" or self.mode == "dark")
+        self._set_title_bar(self.view == "hud" or (self.mode == "dark" and self.view == "plain"))
 
         root.bind("<F5>", lambda e: self.start_check())
         root.bind("<Escape>", lambda e: root.destroy())
@@ -1528,8 +1741,9 @@ class App:
 
     # --- 画面を組み立てる ---
     def build_ui(self):
-        self.c = HUD_PALETTE if self.hud else (FR_PALETTES if self.friendly else PALETTES)[self.mode]
+        self.c = HUD_PALETTE if self.hud else (FR_PALETTE if self.friendly else PALETTES[self.mode])
         self.root.configure(bg=self.c["bg"])
+        self.root.minsize(680, 860) if self.friendly else self.root.minsize(640, 700)
         if self.friendly:
             self._build_friendly()
         else:
@@ -1539,7 +1753,7 @@ class App:
         c = self.c
         if self.friendly:
             return PillButton(parent, colors, c["disabled"], self.fonts["bold"], command=key_command,
-                              outer_bg=parent.cget("bg"), disabled_bg=c["disabled_bg"], **kw)
+                              outer_bg=parent.cget("bg"), disabled_bg=c["disabled_bg"], depth=4, **kw)
         border = None
         if self.hud:
             border = c["line"] if colors is c["plain"] else c["accent"]
@@ -1645,65 +1859,89 @@ class App:
 
     def _build_friendly(self):
         c = self.c
-        outer = tk.Frame(self.root, bg=c["bg"])
-        outer.pack(fill="both", expand=True)
-        self.outer = outer
+        backdrop = tk.Canvas(self.root, bg=c["backdrop_mid"], highlightthickness=0, bd=0)
+        backdrop.pack(fill="both", expand=True)
+        self.outer = self.backdrop = backdrop
+        self.panel = FillPanel(backdrop, c["backdrop_mid"], c["bg"], c["panel_border"], radius=30, pad=18)
+        self._panel_win = backdrop.create_window(34, 22, anchor="nw", window=self.panel)
+        backdrop.bind("<Configure>", self._on_backdrop)
+        inner = self.panel.inner
+        self.subtitle = tk.Label(inner)  # 使わない（apply_texts が文字を入れるだけ）
 
-        band = tk.Frame(outer, bg=c["band"], padx=24, pady=14)
-        band.pack(fill="x")
-        top = tk.Frame(band, bg=c["band"])
-        top.pack(fill="x")
-        self.title = tk.Label(top, font=self.fonts["title"], bg=c["band"], fg=c["teal"])
-        self.title.pack(side="left")
-        self.btn_lang = self._btn(top, c["band_btn"], self.toggle_lang)
-        self.btn_lang.pack(side="right")
-        self.btn_view = self._btn(top, c["band_btn"], self.toggle_view)
-        self.btn_view.pack(side="right", padx=6)
-        self.subtitle = tk.Label(band, font=self.fonts["small"], bg=c["band"], fg=c["muted"], justify="left", anchor="w")
-        self.subtitle.pack(fill="x", pady=(4, 0))
-        band.bind("<Configure>", lambda e: self.subtitle.config(wraplength=max(300, e.width - 60)))
+        header = tk.Frame(inner, bg=c["bg"], height=100)
+        header.pack(fill="x")
+        header.pack_propagate(False)
+        self.title = RainbowTitle(header, c["bg"], self.fonts["title"])
+        self.title.pack(side="left", anchor="s", pady=(0, 4))
+        self.btn_lang = self._btn(header, c["header_btn"], self.toggle_lang)
+        self.btn_lang.pack(side="right", anchor="n", pady=(6, 0))
+        self.btn_view = self._btn(header, c["header_btn"], self.toggle_view)
+        self.btn_view.pack(side="right", anchor="n", padx=8, pady=(6, 0))
+        self.mascot = Mascot(header, c["bg"], [os.path.join(app_dir(), "mascot.png"), os.path.join(data_dir(), "mascot.png")])
+        self.mascot.pack(side="left", anchor="s", padx=(12, 0))
 
-        body = tk.Frame(outer, bg=c["bg"], padx=20, pady=0)
-        body.pack(fill="both", expand=True)
-        self._build_update_bar(body)
+        self._build_update_bar(inner)
 
-        self.scroll = ScrollArea(body, c["bg"])
-        self.scroll.pack(fill="both", expand=True, pady=(12, 0))
-        inner = self.scroll.inner
-        self.cards = {key: Card(inner, c["bg"], c["panel"]) for key in FR_CARD_ORDER}
-        self.fr_visible = {key: key == "result" for key in FR_CARD_ORDER}
-        self._fr_layout()
-        self.root.bind_all("<MouseWheel>", self._on_wheel)
+        self.banner_pill = BannerPill(inner, c["bg"], self.fonts)
+        self.banner_pill.pack(fill="x", pady=(2, 10))
 
-        footer = tk.Frame(body, bg=c["bg"])
-        footer.pack(fill="x", pady=(0, 14))
+        # 下から先に場所を決める（小さい画面でも、ボタンが切れないように）
+        footer = tk.Frame(inner, bg=c["bg"])
+        footer.pack(side="bottom", fill="x")
         self._build_footer(footer)
+        self.shortcuts.pack_forget()
+        self.btn_manual.set_colors(c["manual"])
+        self.btn_close.set_colors(c["close"])
 
-    def _fr_layout(self):
-        for key in FR_CARD_ORDER:
-            self.cards[key].pack_forget()
-        for key in FR_CARD_ORDER:
-            if self.fr_visible[key]:
-                self.cards[key].pack(fill="x", pady=(0, 14), padx=(0, 6))
+        self.table_card = Card(inner, c["bg"], c["panel"], border=c["panel_border"], radius=20, pad=12)
+        self.table_card.pack(fill="x", pady=(0, 10))
+        self.fr_rows, self.fr_source = {}, None
 
-    def _fr_set_visible(self, key, show):
-        if self.fr_visible.get(key) != show:
-            self.fr_visible[key] = show
-            self._fr_layout()
+        self.parch = FillPanel(inner, c["bg"], c["parchment"], c["parchment_border"], radius=18, pad=10, border_w=3)
+        self.parch.pack(fill="both", expand=True, pady=(0, 10))
+        text_frame = tk.Frame(self.parch.inner, bg=c["parchment"])
+        text_frame.pack(fill="both", expand=True)
+        self.text = tk.Text(text_frame, font=self.fonts["body"], wrap="char", bg=c["parchment"], fg=c["ink"],
+                            relief="flat", padx=10, pady=6, highlightthickness=0, height=6,
+                            insertbackground=c["ink"])
+        self.text.tag_configure("h", font=self.fonts["heading"], foreground=c["heading"], spacing1=4, spacing3=4)
+        self.text.tag_configure("p", lmargin1=8, lmargin2=24, spacing3=3)
+        self.text.tag_configure("ok", foreground=c["ok"], font=self.fonts["bold"])
+        self.text.tag_configure("gh", font=self.fonts["bold"], spacing1=6)
+        self.text.tag_configure("gd", foreground=c["muted_ink"], lmargin1=8, lmargin2=8)
+        scroll = ttk.Scrollbar(text_frame, orient="vertical", command=self.text.yview)
+        self.text.configure(yscrollcommand=scroll.set)
+        scroll.pack(side="right", fill="y")
+        self.text.pack(side="left", fill="both", expand=True)
 
-    def _on_wheel(self, event):
-        if self.friendly and hasattr(self, "scroll"):
-            try:
-                self.scroll.scroll(int(-event.delta / 120) or (-1 if event.delta > 0 else 1))
-            except tk.TclError:
-                pass
+    def _on_backdrop(self, e):
+        cv, w, h = self.backdrop, e.width, e.height
+        cv.delete("deco")
+        top, mid, bot = "#d9c9f6", "#bfe5ff", "#d6f5e4"
+        step = 4
+        for y in range(0, h, step):
+            t = y / max(1, h - 1)
+            color = _lerp_color(top, mid, t * 2) if t < 0.5 else _lerp_color(mid, bot, (t - 0.5) * 2)
+            cv.create_rectangle(0, y, w, y + step, fill=color, outline="", tags="deco")
+        for fx, fy, s in ((0.03, 0.26, 26), (0.975, 0.55, 22), (0.02, 0.86, 20)):  # 雲
+            x, y = w * fx, h * fy
+            for dx, dy, r in ((-s, 4, s * 0.7), (0, -6, s * 0.9), (s, 4, s * 0.7), (0, 8, s * 0.8)):
+                cv.create_oval(x + dx - r, y + dy - r * 0.6, x + dx + r, y + dy + r * 0.6, fill="#ffffff", outline="", tags="deco")
+        for fx, fy, s, color in ((0.028, 0.10, 11, "#ffd966"), (0.972, 0.07, 13, "#ffe08a"), (0.03, 0.5, 8, "#ff9ec7"),
+                                 (0.972, 0.34, 10, "#c9a8ff"), (0.03, 0.74, 13, "#ffd966"), (0.972, 0.82, 9, "#ff9ec7"),
+                                 (0.5, 0.012, 7, "#ffffff"), (0.22, 0.99, 8, "#ffe08a"), (0.8, 0.99, 7, "#ffffff")):
+            x, y, k = w * fx, h * fy, s * 0.3
+            cv.create_polygon(x, y - s, x + k, y - k, x + s, y, x + k, y + k, x, y + s, x - k, y + k, x - s, y, x - k, y - k,
+                              fill=color, outline="", tags="deco")
+        cv.tag_lower("deco")
+        cv.itemconfigure(self._panel_win, width=max(100, w - 68), height=max(100, h - 44))
 
     def rebuild(self):
         self.root.unbind_all("<MouseWheel>")
         for w in self.root.winfo_children():
             w.destroy()
         self.build_ui()
-        self._set_title_bar(self.hud or self.mode == "dark")
+        self._set_title_bar(self.hud or (self.mode == "dark" and self.view == "plain"))
         self.apply_scale()
         self.apply_texts()
         self.btn_check.config(state="disabled" if self.checking else "normal")
@@ -1752,6 +1990,8 @@ class App:
             for btn in (self.btn_check, self.btn_copy, self.btn_folder, self.btn_manual, self.btn_close,
                         self.btn_lang, self.btn_view, self.btn_update):
                 btn._layout()
+            self.title._render()
+            self.banner_pill.draw()
             if self.result:
                 self.render(self.result)
 
@@ -1766,7 +2006,7 @@ class App:
 
     def apply_texts(self):
         self.root.title(f"{self.t('app')} {VERSION}")
-        self.title.config(text=self.t("title"))
+        self.title.config(text=self.t("fr_title" if self.friendly else "title"))
         if self.friendly:
             self.subtitle.config(text=self.t("fr_tagline"))
             self.notice.config(text=self.t("subtitle") + "\n" + self.t("notice"))
@@ -1806,6 +2046,8 @@ class App:
         self.source_text = text
         if not self.friendly:
             self.source.config(text=text)
+        elif getattr(self, "fr_source", None) is not None:
+            self.fr_source.config(text=text)
 
     def set_banner(self, key, text):
         if self.friendly:
@@ -1850,7 +2092,7 @@ class App:
         self.update_info = info
         self.update_label.config(text=self.t("update_available").format(v=info[0]))
         if self.friendly:
-            self.update_bar.pack(fill="x", pady=(10, 0), before=self.scroll)
+            self.update_bar.pack(fill="x", pady=(0, 8), before=self.banner_pill)
         else:
             self.update_bar.pack(fill="x", pady=(0, 8), before=self.banner)
 
@@ -1903,13 +2145,7 @@ class App:
     def _placeholder_rows(self, domains):
         self.domains_cache = list(domains)
         if self.friendly:
-            self.fr_row_widgets = {}
-            body = self._fr_card_begin("places", self.t("fr_card_places"))
-            for d in domains + [BASELINE_DOMAIN, "__app__", "__browser__"]:
-                name = (self.t("fr_baseline") if d == BASELINE_DOMAIN else
-                        self.t("fr_row_app") if d == "__app__" else
-                        self.t("fr_row_browser") if d == "__browser__" else d)
-                self._fr_row(body, d, name, self.t("fr_pending"), "pending", "")
+            self._fr_table_build(domains, None)
             return
         self.tree.delete(*self.tree.get_children())
         self.tree.configure(height=len(domains) + 3)
@@ -1924,9 +2160,7 @@ class App:
         self.rows_cache[row["domain"]] = row
         iid = row["domain"]
         if self.friendly:
-            if iid in getattr(self, "fr_row_widgets", {}):
-                self._fr_row_update(iid, self._fr_status(row), "base" if iid == BASELINE_DOMAIN else row["status"],
-                                    self._fr_country(row))
+            self._fr_row_set(iid, row)
             return
         if not self.tree.exists(iid):
             return
@@ -1940,7 +2174,7 @@ class App:
         self.btn_check.config(state="normal")
         if err is not None:
             if self.friendly:
-                self._fr_show_result_card("caution", self.t("fr_head_failed"), self.t("fr_sub_failed"))
+                self._fr_banner("failed")
             else:
                 self.set_banner(CAUTION, self.t("check_failed"))
             self.set_status(self.t("error").format(e=type(err).__name__))
@@ -2008,150 +2242,116 @@ class App:
             self.text.insert("end", f"{i}. {s}\n", "p")
         self.text.config(state="disabled")
 
-    # --- 「やさしい表示」の描画 ---
-    @staticmethod
-    def _nb(text):
-        return text.replace("Claude Code", "Claude Code")
-
-    def _fr_status(self, row):
-        t = self.t
-        text = t("fr_s_" + row["status"])
-        if row.get("note"):
-            text += f"\n{t('note_' + row['note'])}"
-        return text
-
-    def _fr_country(self, row):
-        return " / ".join(country_label(c, self.lang) for c in row["countries"])
-
-    def _fr_color(self, tag):
+    # --- 「やさしい表示」（かわいいパステル）の描画 ---
+    def _fr_pill_colors(self, tag):
         c = self.c
-        return {OK: c[SAFE][0], VPN: c[CAUTION][0], OUTSIDE: c[DANGER][0]}.get(tag, c["muted"])
+        return {OK: (c["ok"], "#ffffff"), VPN: ("#ffb02e", "#5b3b00"), OUTSIDE: ("#ff6f87", "#ffffff"),
+                "pending": ("#dfe9f5", "#5a6b86")}.get(tag, ("#cbd5e5", "#34405c"))
 
-    def _fr_card_begin(self, key, title, fill=None, border=None):
-        card = self.cards[key]
-        self._fr_set_visible(key, True)
-        card.recolor(fill or self.c["panel"], border)
+    def _fr_row_values(self, key, row, apps):
+        """表の1行ぶん：(名前, 国, 状態の文字, 色の種類)"""
+        t = self.t
+        if key in ("__app__", "__browser__"):
+            name = t("row_app" if key == "__app__" else "row_browser")
+            st = "unknown" if apps is None else apps["app" if key == "__app__" else "browser"]["status"]
+            tag = {"direct": OK, "vpn": VPN, "mixed": VPN}.get(st, "base")
+            return name, "—", t("app_" + st), tag
+        country, status = row_values(row, self.lang)
+        name = t("baseline") if key == BASELINE_DOMAIN else key
+        return name, country, status, ("base" if key == BASELINE_DOMAIN else row["status"])
+
+    def _fr_table_build(self, domains, result):
+        """表を作り直す。result が None のときは、「しらべています…」の仮の表。"""
+        c, t = self.c, self.t
+        card = self.table_card
         card.clear()
-        fill = card.fill
-        if title:
-            tk.Label(card.body, text=title, font=self.fonts["heading"], bg=fill, fg=self.c["teal"],
-                     anchor="w").pack(fill="x", pady=(0, 8))
-        return card.body
+        body = card.body
+        body.columnconfigure(0, minsize=290)
+        body.columnconfigure(1, minsize=120)
+        body.columnconfigure(2, weight=1)
+        for col, key in enumerate(("col_domain", "col_country", "col_status")):
+            tk.Label(body, text=t(key), font=self.fonts["bold"], bg=c["table_head"], fg=c["fg"], anchor="w",
+                     padx=12, pady=2).grid(row=0, column=col, sticky="ew", padx=(0 if col == 0 else 6, 0), pady=(0, 6))
+        self.fr_rows = {}
+        keys = list(domains) + [BASELINE_DOMAIN, "__app__", "__browser__"]
+        apps = result.get("apps") if result else None
+        by_key = {}
+        if result:
+            by_key = {r["domain"]: r for r in result["rows"]}
+            by_key[BASELINE_DOMAIN] = result["baseline"]
+        for i, key in enumerate(keys, start=1):
+            if result:
+                name, country, status, tag = self._fr_row_values(key, by_key.get(key), apps)
+            else:
+                name = (t("baseline") if key == BASELINE_DOMAIN else t("row_app") if key == "__app__" else
+                        t("row_browser") if key == "__browser__" else key)
+                country, status, tag = "—", t("fr_pending"), "pending"
+            bold = key in domains
+            name_label = tk.Label(body, text=name, font=self.fonts["bold" if bold else "body"], bg=c["panel"],
+                                  fg=c["fg"] if bold else c["muted"], anchor="w", justify="left", wraplength=280, padx=8)
+            name_label.grid(row=i, column=0, sticky="w", pady=1)
+            country_label = tk.Label(body, text=country, font=self.fonts["body"], bg=c["panel"], fg=c["fg"], anchor="w", padx=8)
+            country_label.grid(row=i, column=1, sticky="w")
+            pill = PillLabel(body, c["panel"], self.fonts["body"], max_width=270)
+            pill.grid(row=i, column=2, sticky="w", padx=(6, 0), pady=1)
+            fill, ink = self._fr_pill_colors(tag)
+            pill.set(status, fill, ink)
+            self.fr_rows[key] = (country_label, pill)
+        self.fr_source = tk.Label(body, text=self.source_text, font=self.fonts["small"], bg=c["panel"], fg=c["muted"], anchor="w")
+        self.fr_source.grid(row=len(keys) + 1, column=0, columnspan=3, sticky="w", pady=(6, 0), padx=8)
 
-    def _fr_row(self, body, iid, name, status, tag, country):
-        fill = body.cget("bg")
-        row = tk.Frame(body, bg=fill)
-        row.pack(fill="x", pady=3)
-        row.columnconfigure(1, minsize=250)
-        row.columnconfigure(2, weight=1)
-        dot = tk.Canvas(row, width=16, height=16, bg=fill, highlightthickness=0)
-        oval = dot.create_oval(2, 2, 14, 14, fill=self._fr_color(tag), outline=self._fr_color(tag))
-        dot.grid(row=0, column=0, sticky="n", padx=(0, 10), pady=4)
-        tk.Label(row, text=self._nb(name), font=self.fonts["bold"], bg=fill, fg=self.c["fg"], anchor="w", justify="left",
-                 wraplength=240).grid(row=0, column=1, sticky="nw")
-        status_label = tk.Label(row, text=status, font=self.fonts["body"], bg=fill, fg=self._fr_color(tag),
-                                anchor="w", justify="left")
-        status_label.grid(row=0, column=2, sticky="nw", padx=(8, 8))
-        country_widget = tk.Label(row, text=country, font=self.fonts["small"], bg=fill, fg=self.c["muted"])
-        country_widget.grid(row=0, column=3, sticky="ne")
-        self.cards["places"].add_wrap(status_label, indent=16 + 10 + 250 + 16 + 110)
-        self.fr_row_widgets[iid] = (dot, oval, status_label, country_widget)
+    def _fr_row_set(self, key, row):
+        if key not in self.fr_rows:
+            return
+        _, country, status, tag = self._fr_row_values(key, row, None)
+        country_label, pill = self.fr_rows[key]
+        country_label.config(text=country)
+        fill, ink = self._fr_pill_colors(tag)
+        pill.set(status, fill, ink)
 
-    def _fr_row_update(self, iid, status, tag, country):
-        dot, oval, status_label, country_widget = self.fr_row_widgets[iid]
-        color = self._fr_color(tag)
-        dot.itemconfigure(oval, fill=color, outline=color)
-        status_label.config(text=status, fg=color)
-        country_widget.config(text=country)
-
-    def _fr_show_result_card(self, level, head, sub):
-        key = {SAFE: SAFE, "safe": SAFE, CAUTION: CAUTION, "caution": CAUTION, DANGER: DANGER, "danger": DANGER}.get(level, "checking")
-        fg, bg = self.c[key]
-        body = self._fr_card_begin("result", None, fill=bg)
-        row = tk.Frame(body, bg=bg)
-        row.pack(fill="x")
-        icon = tk.Canvas(row, width=64, height=64, bg=bg, highlightthickness=0)
-        draw_icon(icon, {SAFE: "safe", CAUTION: "caution", DANGER: "danger"}.get(key, "checking"), 64, fg)
-        icon.pack(side="left", padx=(0, 16))
-        text = tk.Frame(row, bg=bg)
-        text.pack(side="left", fill="x", expand=True)
-        tk.Label(text, text=head, font=self.fonts["banner"], bg=bg, fg=fg, anchor="w", justify="left").pack(fill="x")
-        sub_label = tk.Label(text, text=sub, font=self.fonts["body"], bg=bg, fg=self.c["fg"], anchor="w", justify="left")
-        sub_label.pack(fill="x", pady=(4, 0))
-        self.cards["result"].add_wrap(sub_label, indent=84)
+    def _fr_banner(self, name):
+        t = self.t
+        level = {"safe": "safe", "caution": "caution", "danger": "danger", "failed": "caution"}.get(name, "checking")
+        self.banner_pill.set(level, t("fr_badge_" + name), t("fr_banner_" + name))
 
     def _fr_show_checking(self):
-        self._fr_show_result_card("checking", self.t("fr_head_checking"), self.t("fr_sub_checking"))
-        for key in ("places", "why", "todo", "words"):
-            self.cards[key].clear()
-            self.fr_visible[key] = False
-        self._fr_layout()
+        self._fr_banner("checking")
+        self._fr_table_build([], None)
+        self.text.config(state="normal")
+        self.text.delete("1.0", "end")
+        self.text.config(state="disabled")
 
     def _fr_render(self, result, headline, reasons, actions, level):
         t, c = self.t, self.c
-        failed = result["all_failed"]
-        name = "failed" if failed else level
-        self._fr_show_result_card(level, t("fr_head_" + name), t("fr_sub_" + name))
+        name = "failed" if result["all_failed"] else level
+        self._fr_banner(name)
+        self._fr_table_build([r["domain"] for r in result["rows"]], result)
 
-        # しらべた場所
-        self.fr_row_widgets = {}
-        body = self._fr_card_begin("places", t("fr_card_places"))
-        shown = []
-        for r in result["rows"]:
-            self._fr_row(body, r["domain"], r["domain"], self._fr_status(r), r["status"], self._fr_country(r))
-            shown.append(self._fr_status(r))
-        b = result["baseline"]
-        self._fr_row(body, BASELINE_DOMAIN, t("fr_baseline"), self._fr_status(b), "base", self._fr_country(b))
-        apps = result.get("apps")
-        for key in ("app", "browser"):
-            st = "unknown" if apps is None else apps[key]["status"]
-            tag = {"direct": OK, "vpn": VPN, "mixed": VPN}.get(st, "base")
-            text = t("fr_app_" + st)
-            self._fr_row(body, "__" + key + "__", t("fr_row_" + key), text, tag, "")
-            shown.append(text)
-        src = tk.Label(body, text=self.source_text, font=self.fonts["small"], bg=body.cget("bg"), fg=c["muted"],
-                       anchor="w", justify="left")
-        src.pack(fill="x", pady=(8, 0))
-        self.cards["places"].add_wrap(src)
-
-        # どうして？
-        body = self._fr_card_begin("why", t("fr_card_why"))
+        self.text.config(state="normal", wrap="char" if self.lang == "ja" else "word")
+        self.text.delete("1.0", "end")
+        self.text.insert("end", t("reasons") + "\n", "h")
         for s in reasons:
-            row = tk.Frame(body, bg=body.cget("bg"))
-            row.pack(fill="x", pady=3)
-            tk.Label(row, text="•", font=self.fonts["bold"], bg=body.cget("bg"), fg=c["teal"]).pack(side="left", anchor="n", padx=(0, 8))
-            lb = tk.Label(row, text=self._nb(s), font=self.fonts["body"], bg=body.cget("bg"), fg=c["fg"], anchor="w", justify="left")
-            lb.pack(side="left", fill="x", expand=True)
-            self.cards["why"].add_wrap(lb, indent=28)
-
-        # やること
-        body = self._fr_card_begin("todo", t("fr_card_todo"))
+            self.text.insert("end", ("・" if self.lang == "ja" else "• ") + s + "\n", "p")
+        self.text.insert("end", t("actions") + "\n", "h")
         for i, s in enumerate(actions, 1):
-            fill = body.cget("bg")
-            row = tk.Frame(body, bg=fill)
-            row.pack(fill="x", pady=5)
-            num = tk.Canvas(row, width=30, height=30, bg=fill, highlightthickness=0)
-            num.create_oval(1, 1, 29, 29, fill=c["teal"], outline=c["teal"])
-            num.create_text(15, 15, text=str(i), fill="#ffffff", font=self.fonts["bold"])
-            num.pack(side="left", anchor="n", padx=(0, 12))
-            lb = tk.Label(row, text=self._nb(s), font=self.fonts["body"], bg=fill, fg=c["fg"], anchor="w", justify="left")
-            lb.pack(side="left", fill="x", expand=True)
-            self.cards["todo"].add_wrap(lb, indent=48)
-
-        # ことばの説明（出てきた言葉だけ）
-        haystack = " ".join([headline, t("fr_sub_" + name)] + reasons + actions + shown).lower()
+            self.text.insert("end", "✓ ", ("p", "ok"))
+            self.text.insert("end", f"{i}. {s}\n", "p")
+        shown = []
+        for key, row in [(r["domain"], r) for r in result["rows"]] + [(BASELINE_DOMAIN, result["baseline"]), ("__app__", None), ("__browser__", None)]:
+            shown.append(self._fr_row_values(key, row, result.get("apps"))[2])
+        haystack = " ".join([headline] + reasons + actions + shown).lower()
         entries = [(h, d) for key, h, d in FR_GLOSSARY[self.lang] if key.lower() in haystack]
         if entries:
-            body = self._fr_card_begin("words", t("fr_card_words"))
+            self.text.insert("end", "\n" + t("fr_card_words") + "\n", "h")
             for head, desc in entries:
-                fill = body.cget("bg")
-                tk.Label(body, text=head, font=self.fonts["bold"], bg=fill, fg=c["fg"], anchor="w").pack(fill="x", pady=(6, 0))
-                lb = tk.Label(body, text=desc, font=self.fonts["body"], bg=fill, fg=c["muted"], anchor="w", justify="left")
-                lb.pack(fill="x")
-                self.cards["words"].add_wrap(lb)
-        else:
-            self.cards["words"].clear()
-            self._fr_set_visible("words", False)
+                self.text.insert("end", head + "\n", "gh")
+                self.text.insert("end", desc + "\n", "gd")
+        self.text.config(state="disabled")
+        self.text.yview_moveto(0)
+        if level != SAFE:  # 要注意・危険のときは、「やること」が見えるところまでスクロールしておく
+            pos = self.text.search(t("actions"), "1.0")
+            if pos:
+                self.text.yview(pos)
 
     def copy_domains(self):
         if not self.result:
