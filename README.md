@@ -51,6 +51,18 @@ python -m PyInstaller --onedir --noconsole --name "回線チェッカー" --vers
 
 Python 3.13 と標準ライブラリだけで動きます。 / Requires Python 3.13 and the standard library only.
 
+## テストと自動ビルド / Tests and automated build
+
+```powershell
+python -m unittest discover -s tests -v
+```
+
+- テストはネットワークに接続しません。GitHub では push と pull request のたびに自動で実行します。
+- `v` で始まるタグを push すると、GitHub Actions が zip と `SHA256SUMS.txt` を作り、下書きのリリースに添付します。公開は手動です。
+
+- Tests do not use the network. GitHub runs them on every push and pull request.
+- Pushing a `v*` tag makes GitHub Actions build the zip and `SHA256SUMS.txt` and attach them to a draft release. Publishing is manual.
+
 ## ライセンス / License
 
 MIT License — Copyright (c) 2026 Cape-PC。くわしくは `LICENSE` を見てください。 / See `LICENSE`.

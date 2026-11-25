@@ -1,0 +1,124 @@
+# 配布用の zip を GitHub 上で作る。
+#   手動実行（Actions の「Run workflow」）: zip を作って、実行結果の画面に添付するだけ
+#   v で始まるタグの push              : さらに「下書き」のリリースを作る
+# 公開はしない。下書きの内容を確認してから、人が公開する。
+name: build
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      id-token: write        # ビルドの証明（attestation）の署名に使う
+      attestations: write    # 証明の保存に使う
+    env:
+      PYTHONUTF8: "1"
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+
+      - name: テスト
+        run: python -B -m unittest discover -s tests -v
+
+      - name: 版の確認
+        id: ver
+        run: |
+          $hit = Select-String -Path kaisen_checker.py -Pattern '^VERSION = "([^"]+)"'
+          if (-not $hit) { throw 'kaisen_checker.py に VERSION の行が見つからない' }
+          $ver = $hit.Matches[0].Groups[1].Value
+          if ($env:GITHUB_REF_TYPE -eq 'tag' -and $env:GITHUB_REF_NAME -cne "v$ver") {
+            throw "タグ $env:GITHUB_REF_NAME と、VERSION $ver が合わない"
+          }
+          "version=$ver" >> $env:GITHUB_OUTPUT
+
+      - name: PyInstaller を入れる
+        run: python -m pip install pyinstaller==6.21.0
+
+      - name: アプリをビルド
+        run: >-
+          python -m PyInstaller --onedir --noconsole --noconfirm --clean
+          --name "回線チェッカー"
+          --version-file "$PWD\version_info.txt"
+          --distpath dist
+          --workpath "$env:RUNNER_TEMP\app"
+          --specpath "$env:RUNNER_TEMP\app"
+          kaisen_checker.py
+
+      - name: 取説をビルド
+        run: >-
+          python -m PyInstaller --onefile --noconsole --noconfirm --clean
+          --name "回線チェッカー取説"
+          --version-file "$PWD\取説\version_info.txt"
+          --add-data "$PWD\取説\回線チェッカー取説.html;."
+          --add-data "$PWD\取説\Beginners_Guide_en.html;."
+          --distpath dist\guide
+          --workpath "$env:RUNNER_TEMP\guide"
+          --specpath "$env:RUNNER_TEMP\guide"
+          "取説\torisetsu_viewer.py"
+
+      - name: 配布ファイルをまとめる
+        env:
+          VERSION: ${{ steps.ver.outputs.version }}
+        run: |
+          $app = 'dist\回線チェッカー'
+          $files = '説明書.html', 'Manual_en.html', '画面.png', 'screen_en.png', '画面_やさしい.png',
+                   'screen_friendly_en.png', 'README.md', 'LICENSE', 'dist\guide\回線チェッカー取説.exe'
+          foreach ($f in $files) { Copy-Item -LiteralPath $f -Destination $app }
+          foreach ($exe in '回線チェッカー.exe', '回線チェッカー取説.exe') {
+            if (-not (Test-Path -LiteralPath "$app\$exe")) { throw "$exe ができていない" }
+          }
+          New-Item -ItemType Directory -Force release | Out-Null
+          $zip = "KaisenChecker_v$env:VERSION.zip"   # GitHub は日本語のファイル名を消すので、英数字にする
+          Compress-Archive -LiteralPath $app -DestinationPath "release\$zip"
+          $hash = (Get-FileHash -LiteralPath "release\$zip" -Algorithm SHA256).Hash.ToLower()
+          [IO.File]::WriteAllText("$PWD\release\SHA256SUMS.txt", "$hash  $zip`n")
+          Get-Content release\SHA256SUMS.txt
+
+      - name: ビルドの証明を付ける
+        uses: actions/attest-build-provenance@v4
+        with:
+          subject-path: release/*.zip
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: KaisenChecker
+          path: release/
+          if-no-files-found: error
+          retention-days: 30
+
+  draft-release:
+    if: github.ref_type == 'tag'
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: KaisenChecker
+          path: release
+
+      - name: 下書きのリリースを作る
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            echo "::notice::$TAG のリリースはすでにあるので、何も変えません"
+            exit 0
+          fi
+          gh release create "$TAG" release/* --draft --verify-tag --title "$TAG" \
+            --notes "自動ビルドで作った下書きです。内容を確認してから公開してください。 / Draft created by the automated build."
